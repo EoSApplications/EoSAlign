@@ -6,6 +6,9 @@
 
 EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data.
 
+## Installation 
+
+EoSAlign can be installed here: https://github.com/peaseall/EoSApplications/releases/tag/pre-release
 
 ## Work Flow
 
