@@ -1,8 +1,6 @@
 # <img src="Code/Graphics/EoSAlign_With_Sun.png" alt="EoSAlign Logo" width="80" style="vertical-align:middle;">
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey) ![Python](https://img.shields.io/badge/python-3.10%2B-green)
-
-> **Note:** This is a testing version of EoSAlign. No DOI is currently assigned. Minor errors may be present as we improve the code
+![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey) ![Python](https://img.shields.io/badge/python-3.10%2B-green) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21230860.svg)](https://doi.org/10.5281/zenodo.21230860)
 
 EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data.
 
@@ -126,6 +124,13 @@ Allison Pease<sup>1</sup>, Heidi N. Krauss<sup>2</sup>, Kassandra Amezcua<sup>1<
 For questions regarding this software, contact:  
 &nbsp;&nbsp;&nbsp;&nbsp;Allison Pease: <a href="mailto:apease13@asu.edu">apease13@asu.edu</a>  
 &nbsp;&nbsp;&nbsp;&nbsp;Heidi N. Krauss: <a href="mailto:Heidi.N.Krauss@gmail.com">Heidi.N.Krauss@gmail.com</a>
+
+## Citation
+If you use EoSAlign in your work, please cite it as:
+
+Pease, A., Krauss, H. N., Amezcua, K., & Shim, S.-H. (2026). EoSAlign: An Open–Source Software for Calculating, Comparing, and Aligning Pressure Under Extreme Conditions (v1.0.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21230860
+
+See [CITATION.cff](CITATION.cff) for structured citation metadata.
 
 ## License &nbsp;[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 This project is licensed under the GNU General Public License v3.0. See the LICENSE file for details.  
