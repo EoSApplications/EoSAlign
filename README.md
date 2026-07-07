@@ -1,19 +1,16 @@
-# <img src="Graphics/EoSAlign_With_Sun.PNG" alt="EoSAlign Logo" width="80" style="vertical-align:middle;">
+# <img src="Code/Graphics/EoSAlign_With_Sun.png" alt="EoSAlign Logo" width="80" style="vertical-align:middle;">
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey) ![Python](https://img.shields.io/badge/python-3.9%2B-green)
+![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey) ![Python](https://img.shields.io/badge/python-3.10%2B-green)
 
 > **Note:** This is a testing version of EoSAlign. No DOI is currently assigned. Minor errors may be present as we improve the code
 
 EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data.
 
-## Installation 
-
-EoSAlign can be installed here: https://github.com/peaseall/EoSApplications/releases/tag/pre-release
 
 ## Work Flow
 
 <div align="center">
-  <img src="Graphics/eosalign_workflow.png" alt="EoSAlign Workflow Diagram" width="75%">
+  <img src="Code/Graphics/eosalign_workflow.png" alt="EoSAlign Workflow Diagram" width="100%">
 </div>
 
 EoSAlign supports two main paths:

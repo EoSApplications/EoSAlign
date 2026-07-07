@@ -1,0 +1,75 @@
+/* =============================================================
+   BASE STYLE
+   This file holds general foundation rules and general label
+   styles that apply across the application.
+
+   Override note:
+   - Settings-specific label overrides live in Settings.qss
+   - Collapsible-section label overrides live in
+     Collapsible_Sections.qss
+   - Nested collapsible-section label overrides live in
+     Nested_Collapsible_Sections.qss
+   - EoSHolo-specific footnote labels live in Footnotes.qss
+   - YAML editor/viewer label styles live in
+     View_Edits_And_Save_Calibration_Files_Window.qss
+   ============================================================= */
+
+
+/* ----- Application foundation ----- */
+
+QWidget {
+    background: {Primary_Background};
+    color: {Primary_Text};
+    font-family: 'Noto Sans', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    font-size: 12pt;
+}
+QWidget[objectName=""] {
+    background: transparent;
+}
+QWidget#CentralWidget {
+    background: {Primary_Background};
+    color: {Primary_Text};
+}
+
+
+/* ----- EoSHolo foundation ----- */
+
+QWidget#ControlsBar {
+    background: {Secondary_Background};
+    border-bottom: 1px solid {Quinary_Background};
+}
+
+
+/* ----- General labels ----- */
+
+QLabel#WarningLabel {
+    background: transparent;
+    color: {Warning_Color};
+    font-size: 14pt;
+    font-weight: bold;
+    padding: 5px;
+}
+QLabel#Settings_Header {
+    background: transparent;
+    color: {Primary_Text};
+    font-size: 18pt;
+    font-weight: bold;
+    padding: 10px;
+}
+QLabel#SettingsSubHeader {
+    background: transparent;
+    color: {Secondary_Text};
+    font-size: 14pt;
+    padding: 5px;
+}
+QLabel#Settings_Text {
+    background: transparent;
+    color: {Tertiary_Text};
+    font-size: 12pt;
+    padding: 5px;
+}
+QLabel#ControlsLabel {
+    background: transparent;
+    color: {Quaternary_Text};
+    font-size: 11pt;
+}

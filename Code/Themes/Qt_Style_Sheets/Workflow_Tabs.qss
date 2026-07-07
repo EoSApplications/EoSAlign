@@ -1,0 +1,64 @@
+/* =============================================================
+   WORKFLOW TABS
+   This file holds the workflow tab strip used by
+   Run_Tab_Container.py. It intentionally uses the theme-driven
+   colors from the current shared theme instead of hard-coded
+   experimental tab colors.
+   ============================================================= */
+
+
+/* ----- Workflow tab background ----- */
+
+QWidget#RunTabBackground {
+    background: {Run_Tab_Row_Background};
+}
+
+
+/* ----- Workflow tab row ----- */
+
+QWidget#RunTabRow {
+    background: transparent;
+}
+
+
+/* ----- Workflow tab buttons ----- */
+
+QPushButton#RunTabButton {
+    background: {Secondary_Background};
+    color: {Secondary_Text};
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    padding: 8px 16px;
+    border: none;
+}
+QPushButton#RunTabButton:checked {
+    background: {Primary_Background};
+    color: {Primary_Text};
+    font-weight: bold;
+}
+QPushButton#RunTabButton:hover:!checked {
+    background: {Primary_Background};
+    color: {Primary_Text};
+}
+QPushButton#RunTabButton:focus {
+    outline: none;
+    border: none;
+    border-bottom: none;
+}
+
+
+/* ----- Workflow tab separators and connectors ----- */
+
+QWidget#RunSeparator {
+    background: {Primary_Background};
+}
+
+QWidget#RunTabConnector {
+    background: {Primary_Background};
+}
+
+QWidget#RunTabInactiveConnector {
+    background: {Secondary_Background};
+}

@@ -1,0 +1,21 @@
+/* =============================================================
+   FOOTNOTES
+   This file currently holds dedicated footnote-like styles.
+   WarningPill is included here as a placeholder anchor for the
+   object name used in Collapsible_Sections.py, even though there
+   was no existing QSS rule for it in the original files.
+   ============================================================= */
+
+
+/* ----- EoSHolo controls footnote ----- */
+
+QLabel#ControlsFootnote {
+    background: transparent;
+    color: {Quaternary_Text};
+    font-size: 8pt;
+}
+
+
+/* ----- Missing-uncertainty warning footnote -----
+   Styled inline in Collapsible_Sections.py (Build_Warning_Pill_Label), matching the
+   plain-text approach used for the caution footnote rather than a QSS-driven rule. */

@@ -1,0 +1,18 @@
+/* =============================================================
+   SUCCESS MESSAGES
+   Prepared for:
+   - Message_Manager.py success message boxes
+
+   Python hook:
+   - QMessageBox instances for successes are assigned the object
+     name SuccessMessageBox in Message_Manager.py
+
+   This file is intentionally minimal for now so success-specific
+   styling can be added later without changing the Python hookup.
+   ============================================================= */
+
+
+/* ----- Success message box ----- */
+
+QMessageBox#SuccessMessageBox {
+}

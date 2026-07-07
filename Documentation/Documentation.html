@@ -1,0 +1,76 @@
+<a name="EoSAlign"></a>
+<p>
+EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data.
+</p>
+
+<h3><a name="work_flow"></a>Work Flow</h3>
+<p>EoSAlign supports two main paths:</p>
+<ul>
+  <li><b>Path 1 — Pressure Calculation:</b>
+    <ul>
+      <li>Enter measured data in wavelength, relative wavenumbers, or volume (optional: error propagation)</li>
+      <li>Select composition</li>
+      <li>Calculate pressure from the selected equation of state (optional: adjust ambient reference value)</li>
+    </ul>
+  </li>
+  <li><b>Path 2 — Pressure Alignment:</b>
+    <ul>
+      <li>Enter data in pressure units (optional: error propagation)</li>
+      <li>Select composition</li>
+      <li>Select method</li>
+      <li>Select a pressure calibrant for pressure calibration, then choose a sub-path:
+        <ul>
+          <li><b>Path 2b:</b> Calculate pressure based on a study with the same composition and method, then calculate pressure from the selected equation of state</li>
+          <li><b>Path 2c:</b> Calculate pressure based on a study with a different composition and method — select the target composition, target method, and a conversion study, then calculate pressure from the selected equation of state</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><b>Settings:</b>
+    <ul>
+      <li><b>General</b>
+        <ul>
+          <li>Select between light mode, dark mode, and system default</li>
+        </ul>
+      </li>
+      <li><b>Plots</b>
+        <ul>
+          <li>Select the plot theme</li>
+          <li>Set the font size for plot titles, labels, and ticks</li>
+          <li>Set the marker and line color for each study</li>
+          <li>Reset plots to the default settings</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3><a name="example_data_file"></a>Example Data File</h3>
+<p>
+Data files must consist of numerical values representing either pressure or measured values. Files can be formatted as either a single value per line or a single line with values separated by commas, spaces, or tabs.
+</p>
+<p>
+If error propagation is enabled, the uncertainty data file must contain the same number of values in the same order as the primary data file — each uncertainty value corresponds directly to the data point at the same position.
+</p>
+<div style="text-align:center;">
+<pre>
+Single Column
+1
+2
+3
+4
+5
+</pre>
+<pre>
+Single Line - Comma
+  1, 2, 3, 4, 5 
+</pre>
+<pre>
+Single Line - Space
+ 1 2 3 4 5
+</pre>
+<pre>
+Single Line - Tab
+1\t2\t3\t4\t5
+</pre>
+</div>

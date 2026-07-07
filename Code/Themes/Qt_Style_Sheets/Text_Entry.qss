@@ -1,0 +1,42 @@
+/* =============================================================
+   TEXT ENTRY
+   This file currently contains the shared single-line and
+   multi-line text entry styles.
+
+   Override note:
+   - Collapsible-section text-entry overrides live in
+     Collapsible_Sections.qss
+   - YAML editor/viewer form-field overrides live in
+     View_Edits_And_Save_Calibration_Files_Window.qss
+   ============================================================= */
+
+
+/* ----- Main text entry widgets ----- */
+
+QTextEdit#TextEdit {
+    background: {Quaternary_Background};
+    color: {Primary_Text};
+    border: 1px solid transparent;
+    border-radius: 15px;
+    font-family: 'Noto Sans Mono', monospace;
+    font-size: 12pt;
+    padding: 5px;
+}
+
+QLineEdit#LineEdit {
+    background: {Quaternary_Background};
+    color: {Primary_Text};
+    border: 1px solid transparent;
+    border-radius: 15px;
+    font-family: 'Noto Sans Mono', monospace;
+    font-size: 12pt;
+    padding: 5px;
+}
+
+QWidget#Upload_File_Widget {
+    background: transparent;
+    color: {Primary_Text};
+    border: 1px solid transparent;
+    border-radius: 15px;
+    font-size: 12pt;
+}
