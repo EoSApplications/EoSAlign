@@ -155,7 +155,7 @@ def Prompt_To_Install_Mac_Terminal_Commands_If_Needed(Parent_Window, Application
 
     Application_Information = Get_Application_Information(Application_Id)
     Application_Version = str(Application_Information.get("Version", "") or "").strip()
-    Prompt_Settings = QSettings("EoS", Application_Id)
+    Prompt_Settings = QSettings("EoSApplications", Application_Id)
     Prompt_Key = "Mac_Terminal_Commands__Prompted_Version"
     Last_Prompted_Version = str(Prompt_Settings.value(Prompt_Key, "") or "").strip()
 

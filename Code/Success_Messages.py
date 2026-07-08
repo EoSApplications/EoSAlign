@@ -19,6 +19,21 @@ List_Of_Success_Messages = {
         "Message": "{count} calibration file(s) downloaded successfully.",
     },
 
+    "No Calibration Updates Available": {
+        "Title": "No Calibration Updates Available",
+        "Message": "Your calibration files are already up to date.",
+    },
+
+
+    ########################################
+    # Check For Updates Success Messages
+    ########################################
+
+    "No Update Available": {
+        "Title": "No Update Available",
+        "Message": "You already have the latest version ({current_version}).",
+    },
+
 
     ########################################
     # Batch Export Success Messages

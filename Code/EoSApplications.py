@@ -411,8 +411,44 @@ def Make_The_Application_Launch_Window():
 
 
 
+# Confirm PySide6's compiled Qt bindings can actually load, and exit with actionable
+# guidance instead of a bare traceback if not. This specifically catches the case of
+# running from an Anaconda/Miniconda base environment whose bundled msvcp140.dll
+# (living next to python.exe, which Windows always searches before PySide6's own
+# newer bundled copy) is older than what PySide6's Qt6 binaries require.
+def Exit_If_PySide6_Cannot_Be_Imported():
+
+    try:
+        import PySide6.QtCore  # noqa: F401
+    except ImportError as Import_Error:
+        # Only intercept the DLL-load failure this guard is meant for; let any other
+        # ImportError (e.g. PySide6 genuinely not installed) surface normally
+        if "DLL load failed" not in str(Import_Error):
+            raise
+
+        print("")
+        print("EoSApplications could not load its Qt (PySide6) libraries:")
+        print(f"    {Import_Error}")
+        print("")
+        print("This usually happens when running from an Anaconda/Miniconda base")
+        print("environment whose bundled Microsoft Visual C++ runtime (msvcp140.dll,")
+        print("in the same folder as python.exe) is older than what PySide6's Qt6")
+        print("libraries require. Windows loads that older copy first, before")
+        print("PySide6's own newer bundled copy, causing this failure.")
+        print("")
+        print("To fix it, try one of the following:")
+        print("  1. Update conda:  conda update -n base --all")
+        print("  2. Install/run EoSApplications from a dedicated conda environment")
+        print("     or a plain venv instead of the base environment.")
+        print("")
+        sys.exit(1)
+
+
+
 # Start the launch window
 def main():
+
+    Exit_If_PySide6_Cannot_Be_Imported()
 
     Register_Installed_Application_And_Exit_If_Requested("EoSApplications")
 

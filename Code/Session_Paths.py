@@ -13,13 +13,24 @@ Session_Registry_Directory_Name = ".sessions"
 
 def get_user_data_root():
     if sys.platform == "win32":
-        return Path(os.environ.get("LOCALAPPDATA", os.path.expanduser("~"))) / "EoS"
-    if sys.platform == "darwin":
-        return Path(os.path.expanduser("~/Library/Application Support/EoS"))
-    if sys.platform == "linux":
-        xdg = os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
-        return Path(xdg) / "EoS"
-    return Path(os.path.expanduser("~/.local/share/EoS"))
+        base = Path(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")))
+    elif sys.platform == "darwin":
+        base = Path(os.path.expanduser("~/Library/Application Support"))
+    elif sys.platform == "linux":
+        base = Path(os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")))
+    else:
+        base = Path(os.path.expanduser("~/.local/share"))
+
+    new_root = base / "EoSApplications"
+    # Migrate a pre-rename install (this folder used to be named "EoS") so existing session
+    # registry/figures/manual-entry data isn't silently orphaned in the old folder
+    legacy_root = base / "EoS"
+    if not new_root.exists() and legacy_root.exists():
+        try:
+            os.rename(legacy_root, new_root)
+        except OSError:
+            pass
+    return new_root
 
 
 def Safe_Path_Component(value):

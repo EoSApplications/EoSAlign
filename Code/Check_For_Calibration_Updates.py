@@ -9,6 +9,7 @@ import urllib.request
 from PySide6.QtCore import QThread, Signal, QSettings, QTimer
     # Load local libraries
 from EoS_Math.Load_Calibration_Files import (
+    Application_Calibration_Files_Folder,
     Downloaded_Calibration_Files_Folder,
     Downloaded_Calibration_Files_Previous_Edits_Folder,
     User_Application_Data_Folder,
@@ -105,10 +106,22 @@ def Save_Calibration_Manifest_Record(Record):
 
 
 
+# Hash a calibration file already on disk (bundled with the app or previously downloaded) in the
+    # same "sha256:<hex>" format the remote manifest uses, so it can be compared directly against
+    # a manifest entry without assuming anything about how the file got there
+def Compute_Local_Calibration_File_Hash(Folder, Filename):
+    try:
+        with open(os.path.join(Folder, Filename), 'rb') as Calibration_File:
+            return f"sha256:{hashlib.sha256(Calibration_File.read()).hexdigest()}"
+    except OSError:
+        return None
+
+
+
 # Check whether calibration update notifications are currently turned on
 def Are_Calibration_Update_Notifications_Enabled() -> bool:
 
-    Notification_Settings = QSettings("EoS", Calibration_Update_Notifications_Settings_Scope)
+    Notification_Settings = QSettings("EoSApplications", Calibration_Update_Notifications_Settings_Scope)
     Are_Enabled = Notification_Settings.value(Show_Update_Notifications_Setting_Key, True, type=bool)
 
     # Return whether the user still wants to see calibration update notifications
@@ -121,20 +134,48 @@ def Are_Calibration_Update_Notifications_Enabled() -> bool:
     # and by the matching toggle on the General settings page
 def Set_Calibration_Update_Notifications_Enabled(Are_Enabled: bool):
 
-    Notification_Settings = QSettings("EoS", Calibration_Update_Notifications_Settings_Scope)
+    Notification_Settings = QSettings("EoSApplications", Calibration_Update_Notifications_Settings_Scope)
     Notification_Settings.setValue(Show_Update_Notifications_Setting_Key, bool(Are_Enabled))
+
+
+
+# Seed the local manifest record from whatever calibration files are already on disk, so a fresh
+    # app data folder (or one predating this seeding logic) starts update checks with an accurate
+    # baseline instead of every bundled file looking new on the very first check
+def Seed_Calibration_Manifest_Record_If_Missing():
+
+    # Trust and do not touch an existing record - it is kept accurate by the download flow below
+    if os.path.exists(Calibration_Manifest_Record_Path):
+        return
+
+    Seeded_Record = {}
+    # Bundled files first, then downloaded files so a downloaded copy wins on a name collision -
+    # mirrors the override order Load_Calibration_Files.py uses when loading calibration data
+    for Folder in (Application_Calibration_Files_Folder, Downloaded_Calibration_Files_Folder):
+        if not os.path.isdir(Folder):
+            continue
+        for File in os.listdir(Folder):
+            if not File.endswith('.yaml'):
+                continue
+            File_Hash = Compute_Local_Calibration_File_Hash(Folder, File)
+            if File_Hash:
+                Seeded_Record[File] = File_Hash
+
+    Save_Calibration_Manifest_Record(Seeded_Record)
 
 
 
 # Check the calibration repo in the background for new or changed calibration files
 class Manifest_Check_Worker(QThread):
     manifest_checked = Signal(dict)  # {filename: new_hash} for files that are new or changed
+    check_failed = Signal(str)
 
     def run(self):
         Raw_Base_Url = Get_Calibrations_Raw_Base_Url()
 
         # Skip the check when no repository has been configured
         if not Raw_Base_Url:
+            self.check_failed.emit("No calibration repository is configured.")
             return
 
         try:
@@ -147,17 +188,37 @@ class Manifest_Check_Worker(QThread):
 
             Remote_Files = Remote_Manifest.get("Files", {})
             Local_Record = Load_Calibration_Manifest_Record()
+            Record_Updated = False
 
             # Find every file that is new or whose hash no longer matches what was last downloaded
-            Changed_Files = {
-                Filename: Remote_Hash
-                for Filename, Remote_Hash in Remote_Files.items()
-                if Local_Record.get(Filename) != Remote_Hash
-            }
+            Changed_Files = {}
+            for Filename, Remote_Hash in Remote_Files.items():
+                if Local_Record.get(Filename) == Remote_Hash:
+                    continue
+
+                # The record can lag behind what is actually on disk (e.g. an app update just
+                # replaced the bundled copy with the latest version, or a file was downloaded
+                # before this record entry existed) - fall back to hashing whichever copy is
+                # actually used (a downloaded copy overrides the bundled one) before concluding
+                # the file actually needs to be downloaded
+                Local_Hash = (
+                    Compute_Local_Calibration_File_Hash(Downloaded_Calibration_Files_Folder, Filename)
+                    or Compute_Local_Calibration_File_Hash(Application_Calibration_Files_Folder, Filename)
+                )
+                if Local_Hash == Remote_Hash:
+                    Local_Record[Filename] = Remote_Hash
+                    Record_Updated = True
+                    continue
+
+                Changed_Files[Filename] = Remote_Hash
+
+            # Persist newly-confirmed bundled files so future checks don't need to re-hash them
+            if Record_Updated:
+                Save_Calibration_Manifest_Record(Local_Record)
 
             self.manifest_checked.emit(Changed_Files)
-        except Exception:
-            return
+        except Exception as Error:
+            self.check_failed.emit(str(Error))
 
 
 
@@ -237,13 +298,17 @@ def Start_Calibration_Download(Parent_Window, Approved_Files: dict):
 
 
 # Check for calibration updates, let the user review/preview/select them, then download only what was approved
-def Run_Calibration_Update_Check(Parent_Window):
+    # Manual=True also reports "already up to date" / failure outcomes, since a user who
+    # explicitly asked to check expects some response either way, unlike the silent startup check
+def Run_Calibration_Update_Check(Parent_Window, Manual: bool = False):
     Worker = Manifest_Check_Worker()
     Parent_Window.Eos_Calibration_Check_Worker = Worker
 
     def On_Manifest_Checked(Changed_Files):
         # Nothing to do when every calibration file already matches what was last downloaded
         if not Changed_Files:
+            if Manual:
+                Success_Message(Parent_Window, "No Calibration Updates Available")
             return
 
         Raw_Base_Url = Get_Calibrations_Raw_Base_Url()
@@ -269,6 +334,13 @@ def Run_Calibration_Update_Check(Parent_Window):
         Start_Calibration_Download(Parent_Window, Approved_Files)
 
     Worker.manifest_checked.connect(On_Manifest_Checked)
+
+    if Manual:
+        def On_Check_Failed(Message):
+            Warning_Message(Parent_Window, "Calibration Update Check Failed", message=Message)
+
+        Worker.check_failed.connect(On_Check_Failed)
+
     Worker.start()
 
 
@@ -276,11 +348,25 @@ def Run_Calibration_Update_Check(Parent_Window):
 # Schedule a delayed startup calibration check
 def Check_For_Calibration_Updates_On_Startup(Parent_Window):
 
+    # Make sure a fresh (or pre-seeding) app data folder has an accurate manifest baseline before
+    # any update check runs, so already-bundled files are never mistaken for new ones
+    Seed_Calibration_Manifest_Record_If_Missing()
+
     # Skip the check entirely once the user has asked to stop seeing calibration update notifications
     if not Are_Calibration_Update_Notifications_Enabled():
         return
 
     QTimer.singleShot(1500, lambda: Run_Calibration_Update_Check(Parent_Window))
+
+
+
+# Immediately check for calibration updates, always reporting an outcome
+    # Used by the "Check for Calibration Updates" menu action, so it ignores the notification
+    # suppression setting -- that setting only controls the silent startup check
+def Check_For_Calibration_Updates_Manually(Parent_Window):
+
+    Seed_Calibration_Manifest_Record_If_Missing()
+    Run_Calibration_Update_Check(Parent_Window, Manual=True)
 
 
 

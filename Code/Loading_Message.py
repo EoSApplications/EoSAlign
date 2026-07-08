@@ -58,12 +58,20 @@ def Get_Resource_Path(Relative_Path):
         return os.path.join(Base_Path, Relative_Path)
 
     # Check if the application is running as a pip-installed package
-    try:
-        import importlib.resources
-        Package_Dir = importlib.resources.files("eosapplications")
-        return str(Package_Dir / Relative_Path)
-    except Exception:
-        pass
+        # Only take this branch when this very file was loaded from inside the installed
+        # "eosapplications" package - otherwise, merely having that package pip-installed
+        # somewhere in the environment (e.g. to test a build) would still match here.
+        # importlib.resources.files("eosapplications") has the side effect of importing
+        # the package, whose __init__.py inserts its own directory at the front of
+        # sys.path - which would then shadow every sibling module (EoS_Math, etc.) with
+        # the installed copy instead of the local one for the rest of the process
+    if os.path.basename(os.path.dirname(os.path.abspath(__file__))) == "eosapplications":
+        try:
+            import importlib.resources
+            Package_Dir = importlib.resources.files("eosapplications")
+            return str(Package_Dir / Relative_Path)
+        except Exception:
+            pass
 
     # If the application is running as a script use the current directory
     Base_Path = os.path.abspath(".")

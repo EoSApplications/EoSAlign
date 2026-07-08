@@ -10,7 +10,7 @@ from PySide6.QtCore import QThread, Signal, QSettings, QTimer
     # Load local libraries
 from Version import Get_Application_Information
 from Installed_Applications_Registry import Register_Installed_Application
-from Message_Manager import Warning_Message
+from Message_Manager import Warning_Message, Success_Message
 
 
 
@@ -23,7 +23,7 @@ User_Agent = "EoSAlign-update-check"
 Default_Current_Version = "0.0.0"
 
 # Store the QSettings key that remembers whether update notifications are enabled
-    # Stored per application id under the "EoS" organization, matching the pattern
+    # Stored per application id under the "EoSApplications" organization, matching the pattern
     # already used by Mac_Terminal_Commands.py for other once-per-app preferences
 Show_Update_Notifications_Setting_Key = "Show_Update_Notifications"
 
@@ -117,7 +117,7 @@ def Parse_Version(Version_Text: str) -> tuple:
 # Check whether update notifications are currently turned on for one application
 def Are_Update_Notifications_Enabled(Application_Id: str) -> bool:
 
-    Notification_Settings = QSettings("EoS", Application_Id)
+    Notification_Settings = QSettings("EoSApplications", Application_Id)
     Are_Enabled = Notification_Settings.value(Show_Update_Notifications_Setting_Key, True, type=bool)
 
     # Return whether the user still wants to see update notifications for this application
@@ -130,7 +130,7 @@ def Are_Update_Notifications_Enabled(Application_Id: str) -> bool:
     # and by the matching toggle on the General settings page
 def Set_Update_Notifications_Enabled(Application_Id: str, Are_Enabled: bool):
 
-    Notification_Settings = QSettings("EoS", Application_Id)
+    Notification_Settings = QSettings("EoSApplications", Application_Id)
     Notification_Settings.setValue(Show_Update_Notifications_Setting_Key, bool(Are_Enabled))
 
 
@@ -138,6 +138,8 @@ def Set_Update_Notifications_Enabled(Application_Id: str, Are_Enabled: bool):
 # Check GitHub in the background for a newer version of one application
 class Version_Check_Worker(QThread):
     update_available = Signal(str, str)  # (latest_version, release_page_url)
+    no_update_available = Signal()
+    check_failed = Signal(str)
 
     def __init__(self, Application_Id: str):
         super().__init__()
@@ -149,6 +151,7 @@ class Version_Check_Worker(QThread):
 
         # Skip update checks when no repository has been configured
         if not Github_Api_Url:
+            self.check_failed.emit("No update location is configured for this application.")
             return
 
         try:
@@ -160,10 +163,12 @@ class Version_Check_Worker(QThread):
 
             # Stop if the release payload does not include a tag
             if not Latest_Tag:
+                self.check_failed.emit("GitHub did not report a release for this application.")
                 return
 
             # Stop when the installed version is already current or newer
             if Parse_Version(Latest_Tag) <= Parse_Version(Current_Version):
+                self.no_update_available.emit()
                 return
 
             # Use the GitHub release page itself as the "download it here" link
@@ -174,16 +179,19 @@ class Version_Check_Worker(QThread):
 
             # Stop if GitHub did not report a release page for this tag
             if not Release_Page_Url:
+                self.check_failed.emit("GitHub did not report a release page for the latest version.")
                 return
 
             self.update_available.emit(Latest_Tag.lstrip("v"), Release_Page_Url)
-        except Exception:
-            return
+        except Exception as Error:
+            self.check_failed.emit(str(Error))
 
 
 
 # Check for updates for one application and notify the user if one exists
-def Run_Version_Check(Parent_Window, Application_Id: str):
+    # Manual=True also reports "already up to date" / failure outcomes, since a user who
+    # explicitly asked to check expects some response either way, unlike the silent startup check
+def Run_Version_Check(Parent_Window, Application_Id: str, Manual: bool = False):
     Worker = Version_Check_Worker(Application_Id)
     Parent_Window.Eos_Update_Worker = Worker
 
@@ -207,6 +215,17 @@ def Run_Version_Check(Parent_Window, Application_Id: str):
             Set_Update_Notifications_Enabled(Application_Id, False)
 
     Worker.update_available.connect(On_Update_Available)
+
+    if Manual:
+        def On_No_Update_Available():
+            Success_Message(Parent_Window, "No Update Available", current_version=Get_Current_Version(Application_Id))
+
+        def On_Check_Failed(Message):
+            Warning_Message(Parent_Window, "Update Check Failed", message=Message)
+
+        Worker.no_update_available.connect(On_No_Update_Available)
+        Worker.check_failed.connect(On_Check_Failed)
+
     Worker.start()
 
 
@@ -222,6 +241,16 @@ def Check_For_Updates_On_Startup(Parent_Window, Application_Id: str = "EoSAlign"
         return
 
     QTimer.singleShot(800, lambda: Run_Version_Check(Parent_Window, Application_Id))
+
+
+
+# Immediately check for updates for one application, always reporting an outcome
+    # Used by the "Check for Version Updates" menu action, so it ignores the notification
+    # suppression setting -- that setting only controls the silent startup check
+def Check_For_Updates_Manually(Parent_Window, Application_Id: str = "EoSAlign"):
+
+    Register_Installed_Application(Application_Id)
+    Run_Version_Check(Parent_Window, Application_Id, Manual=True)
 
 
 

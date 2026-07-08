@@ -58,20 +58,6 @@ class Enter_Data(QWidget):
         return Home_Directory
 
 
-    # Get the root folder used for app-managed user data
-    def Get_The_User_Data_Folder(self):
-
-        # Match the location used for user-entered and user-edited calibration files
-        if sys.platform == "win32":
-            return os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), "EoS")
-        elif sys.platform == "darwin":
-            return os.path.expanduser("~/Library/Application Support/EoS")
-        elif sys.platform == "linux":
-            return os.path.join(os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share")), "EoS")
-        else:
-            return os.path.expanduser("~/.local/share/EoS")
-
-
     # Hide a file or folder from the file explorer when the platform supports it
     def Hide_A_Path_From_File_Explorer(self, Path):
         hide_path_from_file_explorer(Path)

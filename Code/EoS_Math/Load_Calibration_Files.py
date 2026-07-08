@@ -62,7 +62,13 @@ def Find_Application_Calibration_Files_Folder():
 # Define all the paths to the calibration files
     # Start with the folder where the user's application data is stored
 User_Applications_Folder = Find_User_Applications_Folder()
-User_Application_Data_Folder = os.path.join(User_Applications_Folder, 'EoS')
+User_Application_Data_Folder = os.path.join(User_Applications_Folder, 'EoSApplications')
+        # Migrate a pre-rename install (the folder used to be named "EoS") so existing users keep
+        # their downloaded/user-entered/edited calibration files and manifest instead of the app
+        # silently starting over in a new, empty folder
+Legacy_User_Application_Data_Folder = os.path.join(User_Applications_Folder, 'EoS')
+if not os.path.exists(User_Application_Data_Folder) and os.path.exists(Legacy_User_Application_Data_Folder):
+    os.rename(Legacy_User_Application_Data_Folder, User_Application_Data_Folder)
         # If the folder does not exist make it
 os.makedirs(User_Application_Data_Folder, exist_ok=True)
         # Inside the user's application data there will be a user edited folder

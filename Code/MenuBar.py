@@ -262,6 +262,16 @@ class MainMenuBar(QMenuBar):
         Included_Calibrations_Action.triggered.connect(self.Open_Documentation_Included_Calibrations)
         # Add a seperator
         Help_Menu.addSeparator()
+            # Check for Version Updates
+        Check_For_Version_Updates_Action = Help_Menu.addAction("Check for Version Updates")
+                # When check for version updates is selected the app checks GitHub for a newer release
+        Check_For_Version_Updates_Action.triggered.connect(self.Check_For_Version_Updates)
+            # Check for Calibration Updates
+        Check_For_Calibration_Updates_Action = Help_Menu.addAction("Check for Calibration Updates")
+                # When check for calibration updates is selected the app checks for new or changed calibration files
+        Check_For_Calibration_Updates_Action.triggered.connect(self.Check_For_Calibration_File_Updates)
+        # Add a seperator
+        Help_Menu.addSeparator()
             # About
         About_Action = Help_Menu.addAction("About")
                 # When about is selected the settings dialog will open to the about section of the about page
@@ -402,6 +412,21 @@ class MainMenuBar(QMenuBar):
     def Open_EoSFitting(self):
 
         Launch_An_Application('EoSFitting.py', 'EoSFitting', Application_Id="EoSFitting")
+
+
+    # Manually check for a newer version of the currently running application
+    def Check_For_Version_Updates(self):
+
+        from Check_For_Updates import Check_For_Updates_Manually
+        from Version import Get_Current_Running_Application_Id
+        Check_For_Updates_Manually(Find_The_Main_Window(self.parent()), Get_Current_Running_Application_Id())
+
+
+    # Manually check for new or changed calibration files
+    def Check_For_Calibration_File_Updates(self):
+
+        from Check_For_Calibration_Updates import Check_For_Calibration_Updates_Manually
+        Check_For_Calibration_Updates_Manually(Find_The_Main_Window(self.parent()))
 
 
     # Open the documentation page

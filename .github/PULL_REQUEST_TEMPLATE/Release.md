@@ -3,10 +3,8 @@
 
 ## Author checklist
 
-- [ ] Version number updated in `README.md`
-- [ ] Version number updated in `Code/Version.py`
-- [ ] Version number updated in all installers
-- [ ] Version number updated in `Installer_Files/Pip/pyproject.toml`
+- [ ] Version number updated in `Code/Version.py` (`Current_Suite_Version`)
+- [ ] `python Development/Installer_Files/Sync_App_Version.py` run and its changes committed
 - [ ] Release notes drafted and accurate
 - [ ] Windows/Mac/Linux installers built successfully
 - [ ] PyPI wheel built successfully

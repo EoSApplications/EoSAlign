@@ -27,6 +27,16 @@ List_Of_Warning_Messages = {
         "Message": "The calibration files could not be downloaded:\n{message}",
     },
 
+    "Update Check Failed": {
+        "Title": "Update Check Failed",
+        "Message": "Could not check for updates:\n{message}",
+    },
+
+    "Calibration Update Check Failed": {
+        "Title": "Calibration Update Check Failed",
+        "Message": "Could not check for calibration updates:\n{message}",
+    },
+
     "Install Mac Terminal Commands": {
         "Title": "Install Terminal Commands",
         "Message": "Install terminal commands for this application?\n\nThis will place launcher commands in /usr/local/bin so they work in Terminal.\nmacOS will ask for administrator permission.\n\n{command_list}",
