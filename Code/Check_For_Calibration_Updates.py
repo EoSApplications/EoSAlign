@@ -106,13 +106,20 @@ def Save_Calibration_Manifest_Record(Record):
 
 
 
+# Normalize text line endings before hashing so equivalent files match on every platform
+def Normalize_Calibration_File_Bytes(File_Bytes):
+    return File_Bytes.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+
+
+
 # Hash a calibration file already on disk (bundled with the app or previously downloaded) in the
     # same "sha256:<hex>" format the remote manifest uses, so it can be compared directly against
     # a manifest entry without assuming anything about how the file got there
 def Compute_Local_Calibration_File_Hash(Folder, Filename):
     try:
         with open(os.path.join(Folder, Filename), 'rb') as Calibration_File:
-            return f"sha256:{hashlib.sha256(Calibration_File.read()).hexdigest()}"
+            File_Bytes = Normalize_Calibration_File_Bytes(Calibration_File.read())
+            return f"sha256:{hashlib.sha256(File_Bytes).hexdigest()}"
     except OSError:
         return None
 
@@ -254,7 +261,8 @@ class Calibration_Download_Worker(QThread):
                     File_Bytes = Response.read()
 
                 # Skip this file if its downloaded contents do not match the manifest's declared hash
-                Actual_Hash = f"sha256:{hashlib.sha256(File_Bytes).hexdigest()}"
+                Canonical_File_Bytes = Normalize_Calibration_File_Bytes(File_Bytes)
+                Actual_Hash = f"sha256:{hashlib.sha256(Canonical_File_Bytes).hexdigest()}"
                 if Actual_Hash != Expected_Hash:
                     continue
 

@@ -584,8 +584,8 @@ def Rebuild_One_Calibration_To_Use_A_User_Inputted_Reference_Value(File_Key, Cus
         Calibration_Information['V0'] = V0
     # Check if the user provided a reference wavelength
     elif Reference_Type == 'lambda_0':
-        # Make sure the the custon reference wavelength is the only reference value provided for this calibration
-        Calibration_Information['Reference Wavelength (nm)'] = Custom_Reference_Value
+        # For Luminescence closures this is stored in the V0 slot
+        Calibration_Information['V0'] = Custom_Reference_Value
     # Check if the user provided a reference frequency/wavenumber
     elif Reference_Type == 'nu_0':
         # For Raman/luminescence closures this is stored in the V0 slot

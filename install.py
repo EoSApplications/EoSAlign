@@ -6,7 +6,7 @@ Run this with:
     python3 install.py       (Mac/Linux)
 
 What it does, in order:
-  1. Checks that Python 3.10+ is running this script.
+  1. Checks that Python 3.12+ is running this script.
   2. Creates a private virtual environment (in ".venv" here on macOS/Linux,
      or in "%LOCALAPPDATA%\EoSApplications\venv" on Windows -- see
      Get_Venv_Dir() for why) so none of this app's dependencies ever touch
@@ -32,7 +32,7 @@ import venv
 from pathlib import Path
 
 
-Minimum_Python_Version = (3, 10)
+Required_Python_Major_Minor = (3, 12)
 
 # Command name -> script inside Code/ that its launcher should run
 Applications = {
@@ -51,12 +51,19 @@ def Print_Heading(Text):
 
 
 def Check_Python_Version():
-    if sys.version_info < Minimum_Python_Version:
+    Current_Major_Minor = sys.version_info[:2]
+    if Current_Major_Minor != Required_Python_Major_Minor:
         Current = ".".join(str(Part) for Part in sys.version_info[:3])
-        Required = ".".join(str(Part) for Part in Minimum_Python_Version)
-        print(f"ERROR: Python {Required}+ is required, but this is Python {Current}.")
-        print("Install a newer Python from https://www.python.org/downloads/ and re-run this script.")
-        sys.exit(1)
+        Required = ".".join(str(Part) for Part in Required_Python_Major_Minor)
+        print(
+            f"ERROR: Python {Required}.x is required, "
+            f"but this is Python {Current}."
+        )
+        print(
+            "Install Python 3.12 from https://www.python.org/downloads/ "
+            "and rerun this script."
+        )
+        raise SystemExit(1)
 
 
 def Get_Venv_Python(Venv_Dir):

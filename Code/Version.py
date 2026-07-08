@@ -14,7 +14,7 @@ import sys
 # (pyproject.toml, the Windows installer, README badges, ...) is generated/synced
 # from this value by Installer_Files/Generate_Pyproject_Toml.py and
 # Installer_Files/Sync_App_Version.py -- never hand-edit a version number elsewhere.
-Current_Suite_Version = "1.0.0"
+Current_Suite_Version = "1.0.1"
 
 # Store the version and repository information for each application
 Applications = {
@@ -22,7 +22,7 @@ Applications = {
         "App_Id": "EoSApplications",
         "Display_Name": "EoS Applications",
         "Version": Current_Suite_Version,
-        "Is_Prerelease": True,
+        "Is_Prerelease": False,
         "Github_Owner": "EoSApplications",
         "Github_Repository": "EoSAlign",
         "Platform_Assets": {
@@ -36,7 +36,7 @@ Applications = {
         "App_Id": "EoSAlign",
         "Display_Name": "EoS Align",
         "Version": Current_Suite_Version,
-        "Is_Prerelease": True,
+        "Is_Prerelease": False,
         "Github_Owner": "EoSApplications",
         "Github_Repository": "EoSAlign",
         "Platform_Assets": {
@@ -49,7 +49,7 @@ Applications = {
         "App_Id": "EoSHolo",
         "Display_Name": "EoS Holo",
         "Version": Current_Suite_Version,
-        "Is_Prerelease": True,
+        "Is_Prerelease": False,
         "Github_Owner": "EoSApplications",
         "Github_Repository": "EoSAlign",
         "Platform_Assets": {
@@ -62,7 +62,7 @@ Applications = {
         "App_Id": "EoSFitting",
         "Display_Name": "EoS Fitting",
         "Version": Current_Suite_Version,
-        "Is_Prerelease": True,
+        "Is_Prerelease": False,
         "Github_Owner": "EoSApplications",
         "Github_Repository": "EoSAlign",
         "Platform_Assets": {

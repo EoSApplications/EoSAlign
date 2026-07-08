@@ -290,7 +290,7 @@ def Build_Dataframe(Data, Units, Composition, Method, Pressure_Calibration_Study
     # Get the uncertainty values
     Uncertainty_Data = Data.get("Uncertainty Data", Data.get("Uncertainty_Data", {}))
     # Get the custom reference information
-    Custom_Reference = Data.get("Custom_Reference", None)
+    Custom_Reference = Data.get("custom_reference", None)
     # Make a place to store the select pressure calibration information
     First_Study = None
     Intermediate_Study_For_Conversion = None

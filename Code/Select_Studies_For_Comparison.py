@@ -350,7 +350,7 @@ class Select_Studies_For_Comparison(QWidget):
         Select_Studies_For_Comparison_Display.addWidget(self.List_Of_Studies_Display)
 
         # Curstom reference
-        Input_Volume_Unit = self.Data.get("volume_unit", "Ų/unit cell") if self.Data else "Ų/unit cell"
+        Input_Volume_Unit = self.Data.get("Volume Unit", "") if self.Data else ""
         
         if self.Method == "XRD":
             Ref_Label = "V₀ (Initial Volume)"
@@ -463,6 +463,10 @@ class Select_Studies_For_Comparison(QWidget):
         self.Deselect_All_Checkboxes_Button.clicked.connect(self.Deselect_All_Checkboxes)
         # Connect the continue button to when the continue button is clicked
         self.Continue_Button.clicked.connect(self.When_The_Continue_Button_Is_Clicked)
+        # Keep self.Data in sync as soon as the user edits the custom reference value/uncertainty,
+        # instead of only when a study checkbox changes, Continue is clicked, or Preview is clicked
+        self.Custom_Ref_Input.textChanged.connect(self.Apply_Custom_Reference_To_Data)
+        self.Custom_Ref_Unc_Input.textChanged.connect(self.Apply_Custom_Reference_To_Data)
 
 
 
@@ -539,7 +543,7 @@ class Select_Studies_For_Comparison(QWidget):
     def Update_Custom_Ref_Labels(self):
 
         # Recompute label and unit based on the current method
-        Input_Volume_Unit = self.Data.get("volume_unit", "Ų/unit cell") if self.Data else "Ų/unit cell"
+        Input_Volume_Unit = self.Data.get("Volume Unit", "") if self.Data else ""
 
         if self.Method == "XRD":
             self.Ref_Label = "V₀ (Initial Volume)"
@@ -576,7 +580,7 @@ class Select_Studies_For_Comparison(QWidget):
     def Toggle_Custom_Ref_Section(self):
         self.Custom_Ref_Enabled = self.Custom_Ref_Button.isChecked()
         self.Custom_Ref_Container.setVisible(self.Custom_Ref_Enabled)
-        
+
         # Update button text to indicate state
         if self.Custom_Ref_Enabled:
             self.Custom_Ref_Button.setText(f"✓ Using Custom {self.Ref_Label}")
@@ -585,6 +589,10 @@ class Select_Studies_For_Comparison(QWidget):
             # Clear the inputs when disabled
             self.Custom_Ref_Input.clear()
             self.Custom_Ref_Unc_Input.clear()
+
+        # Immediately reflect the toggle in self.Data instead of waiting for a
+        # checkbox change, Continue click, or Preview click to pick it up
+        self.Apply_Custom_Reference_To_Data()
 
 
     # Get the custom reference value and uncertainty if enabled
@@ -623,18 +631,28 @@ class Select_Studies_For_Comparison(QWidget):
         return {'value': Value, 'uncertainty': Uncertainty, 'type': Ref_Type, 'method': self.Method}
 
 
+    # Sync the current custom reference UI state into self.Data (set when enabled with a valid
+    # value, cleared otherwise) so any downstream calculation always sees the latest state.
+    def Apply_Custom_Reference_To_Data(self):
+        if self.Data is None:
+            return
+        Custom_Ref = self.Get_Custom_Reference_Value()
+        if Custom_Ref is not None:
+            self.Data['custom_reference'] = Custom_Ref
+        else:
+            self.Data.pop('custom_reference', None)
+
+
     # Preview conversions with selected studies
     def Preview_Conversions(self):
         Selected_Studies = self.Get_Current_Selected_Studies_For_Comparison()
         if not Selected_Studies:
             Warning_Message(self, "No Studies Selected For Preview")
             return
-        
+
         # Get custom reference if enabled
-        Custom_Ref = self.Get_Custom_Reference_Value()
-        if Custom_Ref and self.Data:
-            self.Data['custom_reference'] = Custom_Ref
-        
+        self.Apply_Custom_Reference_To_Data()
+
         # Build dataframe with selected studies (extract string keys from study dicts)
         Selected_Study_Keys = [study["Calibration Key"] for study in Selected_Studies]
         File_Ok, Units_Ok, Error_Msg, DF = Build_Dataframe(self.Data, self.Units, self.Composition, self.Method, Translate_Pressure_Calibration_Study(self.Pressure_Calibration_Study), Selected_Study_Keys)
@@ -694,12 +712,7 @@ class Select_Studies_For_Comparison(QWidget):
 
         if self.Once_A_Change_Is_Made:
             # Apply or clear the custom reference on self.Data for this session only
-            if self.Data is not None:
-                Custom_Ref = self.Get_Custom_Reference_Value()
-                if Custom_Ref is not None:
-                    self.Data['custom_reference'] = Custom_Ref
-                else:
-                    self.Data.pop('custom_reference', None)
+            self.Apply_Custom_Reference_To_Data()
 
             # Send out the current list of selected studies
             self.Once_A_Change_Is_Made(self.Get_Current_Selected_Studies_For_Comparison())

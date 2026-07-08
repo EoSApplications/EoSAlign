@@ -1,6 +1,6 @@
 # <img src="Code/Graphics/EoSAlign_With_Sun.png" alt="EoSAlign Logo" width="80" style="vertical-align:middle;">
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey) ![Python](https://img.shields.io/badge/python-3.10%2B-green) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21230860.svg)](https://doi.org/10.5281/zenodo.21230860)
+![Version](https://img.shields.io/badge/version-1.0.1-blue) ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey) ![Python](https://img.shields.io/badge/python-3.12%2B-green) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21230860.svg)](https://doi.org/10.5281/zenodo.21230860)
 
 EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data.
 
