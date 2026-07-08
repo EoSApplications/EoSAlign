@@ -1,0 +1,63 @@
+/* =============================================================
+   VIEW EDITS AND SAVE YAML FILES WINDOW
+   Original style reference:
+   - Base text-entry styles live in Text_Entry.qss
+   - This file holds the YAML editor/viewer label and field
+     variants used by the dedicated YAML window
+   ============================================================= */
+
+
+/* ----- YAML form labels ----- */
+
+QLabel#FormSectionHeader {
+    color: {Primary_Color};
+    font-size: 13pt;
+    font-weight: bold;
+    padding: 8px 4px 2px 4px;
+}
+
+QLabel#FieldLabel {
+    color: {Secondary_Text};
+    font-size: 11pt;
+    padding: 2px 4px;
+    background: transparent;
+}
+
+QLabel#UserEditedBanner {
+    background: {Warning_Color};
+    color: {Primary_Background};
+    font-size: 11pt;
+    font-weight: bold;
+    padding: 6px 16px;
+}
+
+
+/* ----- YAML form text-entry overrides ----- */
+
+QLineEdit#FieldInput {
+    background: {Quaternary_Background};
+    color: {Primary_Text};
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 10pt;
+    padding: 3px 6px;
+}
+QLineEdit#FieldInput:read-only {
+    background: {Quaternary_Background};
+    color: {Tertiary_Text};
+}
+QLineEdit#FieldInput:focus {
+    border: 1px solid {Primary_Color};
+}
+
+QTextEdit#FieldInput_Multiline {
+    background: {Quaternary_Background};
+    color: {Primary_Text};
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 10pt;
+    padding: 3px 6px;
+}
+QTextEdit#FieldInput_Multiline[readOnly="true"] {
+    color: {Tertiary_Text};
+}

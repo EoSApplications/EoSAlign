@@ -1,0 +1,132 @@
+/* =============================================================
+   EOSHOLO NODE POPUP
+   Original style reference:
+   - General scrollbar baseline lives in Scrollbar.qss
+   - This file contains only the popup-specific scrollbar
+     overrides and popup-local widget styling
+   ============================================================= */
+
+
+/* ----- Popup frame ----- */
+
+QFrame#NodeInfoPopup {
+    background: {Secondary_Background};
+    border: 1px solid transparent;
+    border-radius: 15px;
+    padding: 6px;
+}
+QLabel#NodeInfoTitle {
+    background: {Tertiary_Background};
+    color: {Secondary_Text};
+    font-size: 12pt;
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+QLabel#NodeInfoDivider {
+    background: {Secondary_Text};
+    min-height: 1px;
+    max-height: 1px;
+    margin: 2px 8px;
+}
+QLabel#NodeInfoKey {
+    background: transparent;
+    color: {Tertiary_Text};
+    font-size: 10pt;
+    font-weight: bold;
+    padding: 1px 8px;
+}
+QLabel#NodeInfoValue {
+    background: transparent;
+    color: {Tertiary_Text};
+    font-size: 10pt;
+    padding: 1px 8px;
+}
+QPushButton#NodeInfoCloseButton {
+    background: {Quinary_Background};
+    color: {Secondary_Text};
+    font-size: 11pt;
+    font-weight: bold;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 0px;
+    min-width: 28px;
+    min-height: 28px;
+    max-width: 28px;
+    max-height: 28px;
+}
+QPushButton#NodeInfoCloseButton:hover {
+    background: {Warning_Color};
+    color: {Primary_Background};
+    border-radius: 14px;
+}
+
+QFrame#NodeInfoPopup QPushButton#Preview_Calibration_Button {
+    background: {Tertiary_Color};
+    color: {Primary_Background};
+    font-size: 10pt;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+}
+QFrame#NodeInfoPopup QPushButton#Preview_Calibration_Button:hover {
+    background: {Tertiary_Accent};
+    padding: 6px 10px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+}
+QFrame#NodeInfoPopup QPushButton#Preview_Calibration_Button:disabled {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+    padding: 6px 10px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+}
+QFrame#NodeInfoPopup QPushButton#Preview_Calibration_Button:focus {
+    padding: 6px 10px;
+    border-radius: 15px;
+    outline: none;
+    border: none;
+}
+
+
+/* ----- Popup scroll area ----- */
+
+QScrollArea#NodeInfoScroll {
+    background: transparent;
+    border: none;
+}
+QWidget#NodeInfoViewport {
+    background: transparent;
+}
+QWidget#NodeInfoContent {
+    background: transparent;
+}
+
+
+/* ----- Popup scrollbar overrides ----- */
+
+QScrollArea#NodeInfoScroll QScrollBar:vertical {
+    background: transparent;
+    width: 10px;
+    margin: 2px 0 2px 0;
+    border-radius: 5px;
+}
+QScrollArea#NodeInfoScroll QScrollBar::handle:vertical {
+    background: {Quinary_Background};
+    min-height: 20px;
+    border-radius: 5px;
+}
+QScrollArea#NodeInfoScroll QScrollBar::add-line:vertical,
+QScrollArea#NodeInfoScroll QScrollBar::sub-line:vertical {
+    background: none;
+    height: 0px;
+}
+QScrollArea#NodeInfoScroll QScrollBar::add-page:vertical,
+QScrollArea#NodeInfoScroll QScrollBar::sub-page:vertical {
+    background: none;
+}

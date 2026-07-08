@@ -1,0 +1,11 @@
+/* =============================================================
+   BANNER
+   This file holds the main banner label styling.
+   ============================================================= */
+
+
+/* ----- Main banner label ----- */
+
+QLabel#Banner_Label {
+    background: #000000;
+}

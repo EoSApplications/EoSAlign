@@ -1,0 +1,28 @@
+/* =============================================================
+   NESTED COLLAPSIBLE SECTIONS
+   Original style reference:
+   - The base collapsible-section style lives in
+     Collapsible_Sections.qss
+   ============================================================= */
+
+
+/* ----- Nested card ----- */
+
+QWidget#CollapsibleSection QWidget#CollapsibleSection {
+    background: {Quaternary_Background};
+    border-radius: 10px;
+    margin: 2px 0px;
+}
+
+
+/* ----- Nested header typography ----- */
+
+QWidget#CollapsibleSection QWidget#CollapsibleSection QLabel#CollapsibleTitle {
+    font-size: 12pt;
+    font-weight: bold;
+    color: {Tertiary_Text};
+}
+QWidget#CollapsibleSection QWidget#CollapsibleSection QLabel#CollapsibleArrow {
+    font-size: 20pt;
+    color: {Tertiary_Text};
+}
