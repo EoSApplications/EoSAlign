@@ -1,0 +1,151 @@
+/* =============================================================
+   EOSHOLO
+   Original style reference:
+   - Base style lives in Base_Style.qss
+   - Base button styles live in Buttons.qss
+   - Base dropdown styles live in Dropdowns.qss
+   - Base checkbox styles live in Checkboxes.qss
+   - Footnote styles live in Footnotes.qss
+   ============================================================= */
+
+
+/* ----- Graph view ----- */
+
+QGraphicsView#GraphView {
+    background: {Primary_Background};
+    border: none;
+    outline: none;
+}
+
+
+/* ----- EoSHolo button variant ----- */
+
+QPushButton#PrimaryButton {
+    background: {Primary_Color};
+    color: {Primary_Background};
+    font-size: 12pt;
+    font-weight: bold;
+    padding: 6px 14px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    min-height: 32px;
+}
+QPushButton#PrimaryButton:hover {
+    background: {Primary_Accent};
+}
+QPushButton#PrimaryButton:pressed {
+    background: {Primary_Accent};
+}
+QPushButton#PrimaryButton:focus {
+    outline: none;
+    border: none;
+}
+
+QWidget#ControlsBar QPushButton#Preview_Calibration_Button {
+    background: {Tertiary_Color};
+    color: {Primary_Background};
+    font-size: 10pt;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+}
+QWidget#ControlsBar QPushButton#Preview_Calibration_Button:hover {
+    background: {Tertiary_Accent};
+    padding: 6px 10px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+}
+QWidget#ControlsBar QPushButton#Preview_Calibration_Button:disabled {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+    padding: 6px 10px;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+}
+QWidget#ControlsBar QPushButton#Preview_Calibration_Button:focus {
+    padding: 6px 10px;
+    border-radius: 15px;
+    outline: none;
+    border: none;
+}
+
+
+/* ----- EoSHolo checkbox row overrides ----- */
+
+QWidget#ControlsBar QCheckBox#Checkbox {
+    background: transparent;
+    color: {Tertiary_Text};
+    font-size: 12pt;
+    font-weight: 500;
+    padding: 3px 6px;
+    border-radius: 8px;
+}
+QWidget#ControlsBar QCheckBox#Checkbox:hover {
+    background: transparent;
+}
+QWidget#ControlsBar QCheckBox#Checkbox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Tertiary_Text};
+    border-radius: 3px;
+    background-color: transparent;
+}
+QWidget#ControlsBar QCheckBox#Checkbox::indicator:checked {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Primary_Accent};
+    background-color: {Primary_Accent};
+    image: url(none);
+}
+QWidget#ControlsBar QCheckBox#Checkbox::indicator:unchecked {
+    background-color: transparent;
+    border: 2px solid {Tertiary_Text};
+    image: url(none);
+}
+QWidget#ControlsBar QWidget#CheckboxRow {
+    background: transparent;
+    border-radius: 8px;
+}
+QWidget#ControlsBar QWidget#CheckboxRow:hover {
+    background: {Primary_Accent};
+    border-radius: 8px;
+}
+QWidget#ControlsBar QWidget#CheckboxRow QCheckBox#Checkbox {
+    background: transparent;
+    color: {Tertiary_Text};
+    font-size: 12pt;
+    font-weight: 500;
+    padding: 3px 6px;
+    border-radius: 8px;
+}
+QWidget#ControlsBar QWidget#CheckboxRow QLabel#CollapsibleContentLabel {
+    background: transparent;
+    color: {Tertiary_Text};
+    font-size: 12pt;
+    font-weight: 500;
+}
+QWidget#ControlsBar QWidget#CheckboxRow[hovered="true"] QCheckBox#Checkbox {
+    color: {Primary_Background};
+}
+QWidget#ControlsBar QWidget#CheckboxRow[hovered="true"] QLabel#CollapsibleContentLabel {
+    color: {Primary_Background};
+}
+QWidget#ControlsBar QWidget#CheckboxRow QCheckBox#Checkbox[row_hovered="true"]::indicator:unchecked,
+QWidget#ControlsBar QCheckBox#Checkbox::indicator:unchecked:hover {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Primary_Background};
+    background-color: {Primary_Accent};
+}
+QWidget#ControlsBar QWidget#CheckboxRow QCheckBox#Checkbox[row_hovered="true"]::indicator:checked,
+QWidget#ControlsBar QCheckBox#Checkbox::indicator:checked:hover {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Primary_Background};
+    background-color: {Primary_Background};
+}

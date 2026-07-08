@@ -1,0 +1,18 @@
+/* =============================================================
+   WARNING MESSAGES
+   Prepared for:
+   - Message_Manager.py warning message boxes
+
+   Python hook:
+   - QMessageBox instances for warnings are assigned the object
+     name WarningMessageBox in Message_Manager.py
+
+   This file is intentionally minimal for now so warning-specific
+   styling can be added later without changing the Python hookup.
+   ============================================================= */
+
+
+/* ----- Warning message box ----- */
+
+QMessageBox#WarningMessageBox {
+}

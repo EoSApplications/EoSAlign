@@ -1,0 +1,66 @@
+/* =============================================================
+   CHECKBOXES
+   This file includes the main checkbox styles.
+
+   Override note:
+   - Settings-specific checkbox overrides live in Settings.qss
+   - Collapsible-section checkbox overrides live in
+     Collapsible_Sections.qss
+   - EoSHolo-specific checkbox row overrides live in
+     Themes/Qt_Style_Sheets/EoSHolo.qss
+   ============================================================= */
+
+
+/* ----- Main application checkboxes ----- */
+
+QWidget#CheckboxWidget {
+    background: {Secondary_Background};
+    color: {Secondary_Text};
+    font-size: 12pt;
+    padding: 10px;
+    border-radius: 15px;
+}
+QCheckBox#Checkbox {
+    background: {Quaternary_Background};
+    color: {Primary_Text};
+    font-size: 13pt;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 80px;
+}
+QCheckBox#Checkbox:hover {
+    background: {Primary_Accent};
+    color: {Primary_Text};
+    font-size: 14pt;
+    border-radius: 15px;
+}
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Secondary_Text};
+    border-radius: 3px;
+    background-color: transparent;
+}
+QCheckBox::indicator:hover {
+    width: 20px;
+    height: 20px;
+    border: 2px solid {Primary_Color};
+}
+QCheckBox::indicator:checked {
+    background-color: {Primary_Color};
+    border: 2px solid {Primary_Color};
+    image: url(none);
+}
+QCheckBox::indicator:checked:hover {
+    width: 20px;
+    height: 20px;
+}
+QCheckBox::indicator:unchecked {
+    background-color: transparent;
+    border: 2px solid {Secondary_Text};
+    image: url(none);
+}
+QCheckBox::indicator:unchecked:hover {
+    width: 20px;
+    height: 20px;
+}

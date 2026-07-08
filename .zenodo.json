@@ -1,0 +1,70 @@
+{
+  "title": "EoSAlign: An Open–Source Software for Calculating, Comparing, and Aligning Pressure Under Extreme Conditions",
+  "description": "EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data.",
+  "creators": [
+    {
+      "name": "Pease, Allison",
+      "affiliation": "Department of Earth and Environmental Sciences, Michigan State University, East Lansing, Michigan, United States",
+      "orcid": "0000-0002-5779-5663"
+    },
+    {
+      "name": "Krauss, Heidi N.",
+      "affiliation": "Department of Earth and Environmental Sciences, Michigan State University, East Lansing, Michigan, United States",
+      "orcid": "0000-0002-2279-6551"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Pease, Allison",
+      "affiliation": "Department of Earth and Environmental Sciences, Michigan State University, East Lansing, Michigan, United States",
+      "orcid": "0000-0002-5779-5663",
+      "type": "ContactPerson"
+    },
+    {
+      "name": "Krauss, Heidi N.",
+      "affiliation": "Department of Earth and Environmental Sciences, Michigan State University, East Lansing, Michigan, United States",
+      "orcid": "0000-0002-2279-6551",
+      "type": "ContactPerson"
+    },
+    {
+      "name": "Amezcua, Kassandra",
+      "affiliation": "School of Earth and Space Exploration, Arizona State University, Tempe, Arizona, United States",
+      "orcid": "",
+      "type": "DataCurator"
+    },
+    {
+      "name": "Shim, Sang-Heon",
+      "affiliation": "School of Earth and Space Exploration, Arizona State University, Tempe, Arizona, United States",
+      "orcid": "0000-0001-5203-6038",
+      "type": "Supervisor"
+    }
+  ],
+  "license": "GPL-3.0-only",
+  "upload_type": "software",
+  "access_right": "open",
+  "version": "1.0.0",
+  "language": "eng",
+  "communities": [
+    {
+      "identifier": "EoSApplications"
+    }
+  ],
+  "keywords": [
+    "Equation of State",
+    "high pressure",
+    "database",
+    "software"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/EoSApplications/EoSAlign",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://eosalign.com",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}

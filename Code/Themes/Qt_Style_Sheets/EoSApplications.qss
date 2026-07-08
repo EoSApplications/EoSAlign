@@ -1,0 +1,66 @@
+/* =============================================================
+   EOSAPPLICATIONS
+   This file holds the launcher cards and related application-
+   selection container styling used only by EoSApplications.py.
+   ============================================================= */
+
+
+/* ----- Application launcher container ----- */
+
+QWidget#Application_Launcher {
+    background: {Primary_Background};
+    color: {Primary_Text};
+    border-radius: 15px;
+    padding: 20px;
+    margin: 10px;
+}
+QWidget#Application_Launcher QLabel#Application_Launcher_Title {
+    background: {Secondary_Background};
+    color: {Primary_Text};
+    font-size: 18pt;
+    font-weight: bold;
+    padding: 10px;
+}
+
+
+/* ----- Application card container ----- */
+
+QWidget#Application_Card_Container {
+    background: transparent;
+    color: {Primary_Text};
+    padding: 0px;
+    margin: 0px;
+}
+
+
+/* ----- Application cards ----- */
+
+QWidget#Application_Card {
+    background: {Secondary_Background};
+    color: {Primary_Text};
+    border-radius: 15px;
+    padding: 20px;
+    margin: 10px;
+}
+QWidget#Application_Card:hover {
+    background: {Primary_Accent};
+    color: {Primary_Text};
+}
+QWidget#Application_Card:pressed {
+    background: {Primary_Color};
+    color: {Primary_Text};
+}
+QWidget#Application_Card QLabel#Application_Card_Logo {
+    background: transparent;
+    color: {Primary_Text};
+    font-size: 24pt;
+    font-weight: bold;
+    padding: 0px;
+}
+QWidget#Application_Card QLabel#Application_Card_Description {
+    background: transparent;
+    color: {Primary_Text};
+    border-radius: 15px;
+    font-size: 12pt;
+    padding: 10px 0px 0px 0px;
+}

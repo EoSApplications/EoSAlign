@@ -1,0 +1,55 @@
+/* =============================================================
+   PREVIEW CSV
+   This file styles the QTableWidget used by Conversion_Window.py
+   for the conversion preview dialog.
+   ============================================================= */
+
+
+/* ----- Preview table baseline ----- */
+
+QTableWidget {
+    background: {Primary_Background};
+    color: {Primary_Text};
+    gridline-color: {Quaternary_Background};
+    border: 1px solid {Quaternary_Background};
+    border-radius: 5px;
+    selection-background-color: {Primary_Accent};
+    selection-color: {Secondary_Text};
+}
+QTableWidget::item {
+    padding: 5px;
+    border: none;
+}
+QTableWidget::item:selected {
+    background-color: {Primary_Accent};
+    color: {Secondary_Text};
+}
+QTableWidget::item:focus {
+    background-color: {Primary_Accent};
+    color: {Secondary_Text};
+    outline: none;
+}
+QHeaderView::section {
+    background: {Secondary_Background};
+    color: {Primary_Text};
+    padding: 8px;
+    border: 1px solid {Quaternary_Background};
+    font-weight: bold;
+}
+QTableCornerButton::section {
+    background: {Secondary_Background};
+    border: 1px solid {Quaternary_Background};
+}
+
+
+/* ----- Conversion preview table overrides ----- */
+
+QTableWidget#PreviewDataTable::item:selected {
+    background-color: {Primary_Accent};
+    color: {Primary_Background};
+}
+QTableWidget#PreviewDataTable::item:focus {
+    background-color: {Primary_Accent};
+    color: {Primary_Background};
+    outline: none;
+}

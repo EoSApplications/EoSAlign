@@ -1,0 +1,102 @@
+/* =============================================================
+   DROPDOWNS
+   This file holds the base dropdown style.
+
+   Override note:
+   - Settings-specific dropdown overrides live in Settings.qss
+   - Collapsible-section dropdown overrides live in
+     Collapsible_Sections.qss
+   - EoSHolo uses the same base dropdown style and does not need
+     a separate dropdown override at this stage
+   ============================================================= */
+
+
+/* ----- Base dropdown style ----- */
+
+QComboBox#Dropdown {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+    border: 1px solid transparent;
+    border-radius: 15px;
+    font-size: 12pt;
+    padding: 4px 30px 4px 8px;
+    min-height: 32px;
+    /* Force Qt's own styleable popup instead of the native macOS popup menu,
+       which otherwise ignores this entire stylesheet (combobox-popup: 1 is
+       the macOS-native-menu mode; 0 makes Fusion draw the QAbstractItemView
+       popup below so border-radius/colors/hover states actually apply). */
+    combobox-popup: 0;
+}
+QComboBox#Dropdown::down-arrow {
+    image: none;
+    width: 0px;
+    height: 0px;
+}
+QLabel#DropdownArrow {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+    font-size: 14pt;
+}
+QComboBox#Dropdown::drop-down {
+    background: {Quaternary_Background};
+    border: none;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    width: 28px;
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    margin: 0px;
+    padding: 0px;
+}
+QComboBox#Dropdown QAbstractItemView {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+    selection-color: {Primary_Background};
+    selection-background-color: {Primary_Color};
+    border: 2px solid {Quaternary_Background};
+    border-radius: 15px;
+    margin: 0px;
+    padding: 0px;
+    outline: none;
+    max-width: 600px;
+}
+QComboBox#Dropdown QAbstractItemView::item {
+    color: {Quaternary_Text};
+    border-radius: 15px;
+    padding: 8px 16px;
+    margin: 4px 8px;
+}
+QComboBox#Dropdown QAbstractItemView::item:first {
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+QComboBox#Dropdown QAbstractItemView::item:last {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+QComboBox#Dropdown QAbstractItemView::item:hover {
+    background: {Primary_Color};
+    color: {Primary_Background};
+    outline: none;
+    border: none;
+}
+QComboBox#Dropdown QAbstractItemView QScrollBar:vertical {
+    background: {Quaternary_Background};
+    width: 12px;
+    margin: 2px 0 2px 0;
+    border-radius: 6px;
+}
+QComboBox#Dropdown QAbstractItemView QScrollBar::handle:vertical {
+    background: {Quaternary_Background};
+    min-height: 24px;
+    border-radius: 6px;
+}
+QComboBox#Dropdown QAbstractItemView QScrollBar::add-line:vertical,
+QComboBox#Dropdown QAbstractItemView QScrollBar::sub-line:vertical {
+    background: none;
+    height: 0px;
+}
+QComboBox#Dropdown QAbstractItemView QScrollBar::add-page:vertical,
+QComboBox#Dropdown QAbstractItemView QScrollBar::sub-page:vertical {
+    background: none;
+}

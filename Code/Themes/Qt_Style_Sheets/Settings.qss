@@ -1,0 +1,164 @@
+/* =============================================================
+   SETTINGS
+   Override reference:
+   - Base label styles live in Base_Style.qss
+   - Base button styles live in Buttons.qss
+   - Base dropdown styles live in Dropdowns.qss
+   - Base checkbox styles live in Checkboxes.qss
+   ============================================================= */
+
+
+/* ----- Settings sidebar ----- */
+
+QListWidget#SettingsTabTitle {
+    background: transparent;
+    border: none;
+    padding: 4px 0px;
+}
+QListWidget#SettingsTabTitle::item {
+    background: {Secondary_Background};
+    color: {Primary_Text};
+    font-size: 14pt;
+    font-weight: bold;
+    padding: 10px 14px;
+    border-radius: 15px;
+    margin: 4px 8px;
+    border-left: 3px solid transparent;
+}
+QListWidget#SettingsTabTitle::item:hover {
+    background: {Primary_Accent};
+    color: {Primary_Background};
+    border-left: 3px solid {Primary_Color};
+}
+QListWidget#SettingsTabTitle::item:selected {
+    background: {Primary_Color};
+    color: {Primary_Background};
+    border-left: 3px solid {Primary_Accent};
+}
+QListWidget#SettingsTabTitle::item:selected:hover {
+    background: {Primary_Accent};
+    color: {Primary_Background};
+    border-left: 3px solid {Primary_Color};
+}
+
+
+/* ----- Settings content panel ----- */
+
+QWidget#SettingsContentPanel {
+    background: {Secondary_Background};
+    border-radius: 15px;
+}
+QWidget#SettingsContentPanel QStackedWidget,
+QWidget#SettingsContentPanel QStackedWidget > QWidget {
+    background: transparent;
+}
+QWidget#SettingsContentPanel QWidget[objectName=""] {
+    background: transparent;
+}
+QWidget#UncertaintyStyleRow {
+    background: transparent;
+}
+QWidget#SettingsContentPanel QLabel {
+    background: transparent;
+    color: {Tertiary_Text};
+}
+QWidget#SettingsContentPanel QLabel#Settings_Header {
+    background: transparent;
+    color: {Secondary_Text};
+    font-size: 18pt;
+    font-weight: bold;
+    padding: 6px 10px 10px 10px;
+}
+QWidget#SettingsContentPanel QTextBrowser {
+    background: {Quaternary_Background};
+    color: {Primary_Text};
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 4px;
+}
+
+
+/* ----- Settings checkbox overrides ----- */
+
+QWidget#SettingsContentPanel QCheckBox {
+    background: transparent;
+    color: {Tertiary_Text};
+}
+QWidget#SettingsContentPanel QCheckBox::indicator {
+    border: 2px solid {Tertiary_Text};
+}
+QWidget#SettingsContentPanel QCheckBox::indicator:checked {
+    background-color: {Primary_Color};
+    border: 2px solid {Primary_Color};
+}
+
+
+/* ----- Settings dropdown overrides ----- */
+
+QWidget#SettingsContentPanel QComboBox#Dropdown {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+}
+QWidget#SettingsContentPanel QComboBox#Dropdown::drop-down {
+    background: {Quaternary_Background};
+}
+QWidget#SettingsContentPanel QLabel#DropdownArrow {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+}
+
+
+/* ----- Settings spin boxes ----- */
+
+QWidget#SettingsContentPanel QSpinBox {
+    background: {Quaternary_Background};
+    color: {Primary_Text};
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-family: 'Noto Sans Mono', monospace;
+    font-size: 12pt;
+    padding: 4px 6px;
+    min-height: 28px;
+}
+QWidget#SettingsContentPanel QSpinBox::up-button,
+QWidget#SettingsContentPanel QSpinBox::down-button {
+    background: transparent;
+    border: none;
+    width: 18px;
+}
+
+
+/* ----- Nested collapsible variation inside settings ----- */
+
+QWidget#SettingsContentPanel QWidget#CollapsibleSection {
+    background: {Quaternary_Background};
+    border-radius: 10px;
+    margin: 2px 0px;
+}
+QWidget#SettingsContentPanel QWidget#CollapsibleSection QLabel#CollapsibleTitle {
+    font-size: 12pt;
+    font-weight: bold;
+    color: {Tertiary_Text};
+}
+QWidget#SettingsContentPanel QWidget#CollapsibleSection QLabel#CollapsibleArrow {
+    font-size: 20pt;
+    color: {Tertiary_Text};
+}
+QWidget#SettingsContentPanel QWidget#CollapsibleSection QWidget#CollapsibleContentRow {
+    background: transparent;
+}
+QWidget#SettingsContentPanel QWidget#CollapsibleSection QLabel {
+    background: transparent;
+    color: {Tertiary_Text};
+}
+QWidget#SettingsContentPanel QWidget#CollapsibleSection QComboBox#Dropdown {
+    background: {Senary_Background};
+    color: {Quaternary_Text};
+}
+QWidget#SettingsContentPanel QWidget#CollapsibleSection QComboBox#Dropdown::drop-down {
+    background: {Senary_Background};
+}
+QWidget#SettingsContentPanel QWidget#CollapsibleSection QLabel#DropdownArrow {
+    background: {Senary_Background};
+    color: {Quaternary_Text};
+}

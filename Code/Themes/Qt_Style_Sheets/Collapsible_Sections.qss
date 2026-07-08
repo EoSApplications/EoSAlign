@@ -1,0 +1,430 @@
+/* =============================================================
+   COLLAPSIBLE SECTIONS
+   Override reference:
+   - Base button styles live in Buttons.qss
+   - Base dropdown styles live in Dropdowns.qss
+   - Base checkbox styles live in Checkboxes.qss
+   - Base text-entry styles live in Text_Entry.qss
+   - Nested collapsible-section variations live in
+     Nested_Collapsible_Sections.qss
+   ============================================================= */
+
+
+/* ----- Outer card ----- */
+
+QWidget#CollapsibleSection {
+    background: {Secondary_Background};
+    border-radius: 15px;
+    margin: 5px;
+}
+
+
+/* ----- Header bar ----- */
+
+QWidget#CollapsibleHeader {
+    background: transparent;
+    border-radius: 15px;
+}
+
+QLabel#CollapsibleArrow {
+    background: transparent;
+    color: {Secondary_Text};
+    font-size: 24pt;
+    min-width: 24px;
+    max-width: 24px;
+}
+QLabel#CollapsibleTitle {
+    background: transparent;
+    color: {Secondary_Text};
+    font-size: 14pt;
+    font-weight: bold;
+    margin: 5px;
+}
+
+
+/* ----- Locked header ----- */
+
+QWidget#CollapsibleHeader[locked="true"] {
+}
+QWidget#CollapsibleHeader[locked="true"] QLabel#CollapsibleTitle {
+    color: {Quinary_Text};
+}
+QWidget#CollapsibleHeader[locked="true"] QLabel#CollapsibleArrow {
+    color: {Quinary_Text};
+}
+
+
+/* ----- Content area ----- */
+
+QWidget#CollapsibleSection QWidget#CollapsibleContentRow {
+    background: transparent;
+}
+QWidget#CollapsibleSection QWidget#CollapsibleContent {
+    background: transparent;
+}
+QWidget#CollapsibleSection QWidget#CollapsibleSubContainer {
+    background: transparent;
+}
+QWidget#CollapsibleSection QLabel {
+    background: transparent;
+}
+QWidget#CollapsibleSection QLabel#CollapsibleContentLabel {
+    background: transparent;
+    color: {Tertiary_Text};
+}
+QWidget#CollapsibleSection QLabel#CollapsibleContentHeader {
+    background: transparent;
+    color: {Tertiary_Text};
+    font-size: 12pt;
+}
+
+
+/* ----- Plot card inside collapsible sections ----- */
+
+QWidget#PlotCard {
+    background: {Tertiary_Background};
+    border-radius: 10px;
+}
+
+
+/* ----- Collapsible section checkbox overrides ----- */
+
+QWidget#CollapsibleSection QCheckBox {
+    background: transparent;
+    color: {Tertiary_Text};
+}
+QWidget#CollapsibleSection QCheckBox#Checkbox {
+    background: transparent;
+    color: {Tertiary_Text};
+    font-size: 12pt;
+    padding: 3px 6px;
+}
+QWidget#CollapsibleSection QCheckBox#Checkbox:hover {
+    background: transparent;
+}
+QWidget#CollapsibleSection QCheckBox#Checkbox::indicator {
+    width: 18px;
+    height: 18px;
+}
+QWidget#CollapsibleSection QCheckBox#Checkbox::indicator:hover {
+    width: 18px;
+    height: 18px;
+}
+QWidget#CollapsibleSection QCheckBox#Checkbox::indicator:checked {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Primary_Color};
+    background-color: {Primary_Color};
+}
+QWidget#CollapsibleSection QCheckBox#Checkbox::indicator:checked:hover {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Primary_Accent};
+    background-color: {Primary_Accent};
+}
+QWidget#CollapsibleSection QCheckBox#Checkbox::indicator:unchecked:hover {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Tertiary_Text};
+    background-color: {Primary_Color};
+}
+
+QWidget#CollapsibleSection QWidget#CheckboxRow {
+    background: transparent;
+    border-radius: 8px;
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow:hover {
+    background: {Primary_Accent};
+    border-radius: 8px;
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow QCheckBox#Checkbox {
+    background: transparent;
+    color: {Tertiary_Text};
+    font-size: 12pt;
+    padding: 3px 6px;
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow QLabel#CollapsibleContentLabel {
+    background: transparent;
+    color: {Tertiary_Text};
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow[hovered="true"] QCheckBox#Checkbox {
+    background: transparent;
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow[hovered="true"] QLabel#CollapsibleContentLabel {
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow QCheckBox#Checkbox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Tertiary_Text};
+    border-radius: 3px;
+    background-color: transparent;
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow QCheckBox#Checkbox::indicator:unchecked {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Tertiary_Text};
+    background-color: transparent;
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow QCheckBox#Checkbox[row_hovered="true"]::indicator:unchecked,
+QWidget#CollapsibleSection QWidget#CheckboxRow QCheckBox#Checkbox::indicator:unchecked:hover {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Primary_Background};
+    background-color: {Primary_Accent};
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow QCheckBox#Checkbox::indicator:checked {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Primary_Accent};
+    background-color: {Primary_Accent};
+}
+QWidget#CollapsibleSection QWidget#CheckboxRow QCheckBox#Checkbox[row_hovered="true"]::indicator:checked,
+QWidget#CollapsibleSection QWidget#CheckboxRow QCheckBox#Checkbox::indicator:checked:hover {
+    width: 18px;
+    height: 18px;
+    border: 2px solid {Primary_Background};
+    background-color: {Primary_Background};
+}
+
+
+/* ----- Scroll areas inside collapsible sections ----- */
+
+QWidget#CollapsibleSection QScrollArea {
+    background: {Quinary_Background};
+    border: 1px solid transparent;
+    border-radius: 15px;
+}
+QWidget#CollapsibleSection QScrollArea QScrollBar:vertical {
+    background: {Quinary_Background};
+    border-radius: 0px;
+}
+QWidget#CollapsibleSection QScrollArea QScrollBar::handle:vertical {
+    background: {Senary_Background};
+    border-radius: 0px;
+}
+QWidget#CollapsibleSection QScrollArea QScrollBar::handle:vertical:hover {
+    background: {Primary_Color};
+    border-radius: 0px;
+}
+
+
+/* ----- Group boxes inside collapsible sections ----- */
+
+QWidget#CollapsibleSection QGroupBox {
+    background: transparent;
+    color: {Tertiary_Text};
+}
+
+
+/* ----- Collapsible section button overrides ----- */
+
+QWidget#CollapsibleSection QPushButton#ModeButton {
+    background: {Primary_Disabled};
+    color: {Tertiary_Background};
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    padding: 6px 12px;
+}
+QWidget#CollapsibleSection QPushButton#ModeButton:hover {
+    background: {Primary_Accent};
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButton:checked {
+    background: {Primary_Color};
+    color: {Secondary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButton:checked:hover {
+    background: {Primary_Accent};
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButton QLabel {
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QPushButton#ModeButton:hover QLabel {
+    color: {Primary_Text};
+}
+QWidget#CollapsibleSection QPushButton#ModeButton:checked QLabel {
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButton:checked:hover QLabel {
+    color: {Primary_Background};
+}
+
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary {
+    background: {Secondary_Disabled};
+    color: {Tertiary_Background};
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    padding: 6px 12px;
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:hover {
+    background: {Secondary_Accent};
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:checked {
+    background: {Secondary_Color};
+    color: {Secondary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:checked:hover {
+    background: {Secondary_Accent};
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary QLabel {
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:hover QLabel {
+    color: {Primary_Text};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:checked QLabel {
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:checked:hover QLabel {
+    color: {Primary_Background};
+}
+
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary {
+    background: {Tertiary_Disabled};
+    color: {Tertiary_Background};
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    padding: 6px 12px;
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:hover {
+    background: {Tertiary_Accent};
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:checked {
+    background: {Tertiary_Color};
+    color: {Secondary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:checked:hover {
+    background: {Tertiary_Accent};
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary QLabel {
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:hover QLabel {
+    color: {Primary_Text};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:checked QLabel {
+    color: {Primary_Background};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:checked:hover QLabel {
+    color: {Primary_Background};
+}
+
+QWidget#CollapsibleSection QPushButton#Primary_Button:disabled {
+    background: {Secondary_Background};
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QPushButton#Secondary_Button:disabled {
+    background: {Secondary_Background};
+    color: {Quaternary_Text};
+}
+
+QWidget#CollapsibleSection QPushButton#ModeButton:disabled,
+QWidget#CollapsibleSection QPushButton#ModeButton:checked:disabled {
+    background: {Secondary_Background};
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QPushButton#ModeButton:disabled QLabel,
+QWidget#CollapsibleSection QPushButton#ModeButton:checked:disabled QLabel {
+    color: {Quaternary_Text};
+}
+
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:disabled,
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:checked:disabled {
+    background: {Secondary_Background};
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:disabled QLabel,
+QWidget#CollapsibleSection QPushButton#ModeButtonSecondary:checked:disabled QLabel {
+    color: {Quaternary_Text};
+}
+
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:disabled,
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:checked:disabled {
+    background: {Secondary_Background};
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:disabled QLabel,
+QWidget#CollapsibleSection QPushButton#ModeButtonTertiary:checked:disabled QLabel {
+    color: {Quaternary_Text};
+}
+
+
+/* ----- Collapsible section dropdown overrides ----- */
+
+QWidget#CollapsibleSection QComboBox#Dropdown {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QComboBox#Dropdown::drop-down {
+    background: {Quaternary_Background};
+}
+QWidget#CollapsibleSection QComboBox#Dropdown QLabel#DropdownArrow {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QComboBox#Dropdown QAbstractItemView {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+    selection-color: {Primary_Background};
+    selection-background-color: {Primary_Color};
+}
+QWidget#CollapsibleSection QComboBox#Dropdown QAbstractItemView::item {
+    color: {Quaternary_Text};
+    border-radius: 15px;
+    padding: 8px 16px;
+    margin: 4px 8px;
+}
+QWidget#CollapsibleSection QComboBox#Dropdown QAbstractItemView::item:hover {
+    background: {Primary_Color};
+    color: {Primary_Background};
+    border-radius: 15px;
+    outline: none;
+    border: none;
+}
+QWidget#CollapsibleSection QComboBox#Dropdown QAbstractItemView QScrollBar:vertical {
+    background: {Quaternary_Background};
+    border-radius: 0px;
+}
+QWidget#CollapsibleSection QComboBox#Dropdown QAbstractItemView QScrollBar::handle:vertical {
+    background: {Quaternary_Background};
+    border-radius: 0px;
+}
+
+QWidget#CollapsibleSection QWidget#IndentedDropdownRow {
+    margin-left: 20px;
+}
+
+
+/* ----- Collapsible section text-entry overrides ----- */
+
+QWidget#CollapsibleSection QTextEdit#TextEdit {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+}
+QWidget#CollapsibleSection QLineEdit#LineEdit {
+    background: {Quaternary_Background};
+    color: {Quaternary_Text};
+}
+
+QWidget#CollapsibleSection QTextEdit#TextEdit QScrollBar:vertical {
+    background: {Quaternary_Background};
+    border-radius: 0px;
+}
+QWidget#CollapsibleSection QTextEdit#TextEdit QScrollBar::handle:vertical {
+    background: {Senary_Background};
+    border-radius: 15px;
+}
+QWidget#CollapsibleSection QTextEdit#TextEdit QScrollBar::handle:vertical:hover {
+    background: {Senary_Background};
+    border-radius: 15px;
+}

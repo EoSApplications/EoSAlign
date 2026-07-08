@@ -1,0 +1,30 @@
+/* =============================================================
+   MENU BAR
+   This file holds the application menu bar and menu styles.
+   ============================================================= */
+
+
+/* ----- Menu bar and menus ----- */
+
+QMenuBar, QMenu {
+    background: {Tertiary_Background};
+    color: {Primary_Text};
+    font-size: 10pt;
+    padding: 4px 12px;
+    margin: 0px;
+    border-bottom: 1px solid rgba(0,0,0,0.75);
+}
+QMenuBar::item, QMenu::item {
+    background: {Secondary_Background};
+    color: {Primary_Text};
+    font-size: 10pt;
+    padding: 4px 12px;
+    margin: 0px;
+}
+QMenuBar::item:selected, QMenu::item:selected {
+    background: {Quinary_Background};
+    color: {Secondary_Text};
+    font-size: 10pt;
+    padding: 4px 12px;
+    margin: 0px;
+}
