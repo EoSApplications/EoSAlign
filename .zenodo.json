@@ -1,10 +1,10 @@
 {
   "title": "EoSAlign: An Open–Source Software for Calculating, Comparing, and Aligning Pressure Under Extreme Conditions",
-  "description": "EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data.",
+  "description": "<p><strong>Author Note:</strong> Allison Pease and Heidi N. Krauss contributed equally to this work and share joint first authorship.</p><p><strong>Description: </strong>EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data.</p>",
   "creators": [
     {
       "name": "Pease, Allison",
-      "affiliation": "Department of Earth and Environmental Sciences, Michigan State University, East Lansing, Michigan, United States",
+      "affiliation": "School of Earth and Space Exploration, Arizona State University, Tempe, Arizona, United States",
       "orcid": "0000-0002-5779-5663"
     },
     {
@@ -16,7 +16,7 @@
   "contributors": [
     {
       "name": "Pease, Allison",
-      "affiliation": "Department of Earth and Environmental Sciences, Michigan State University, East Lansing, Michigan, United States",
+      "affiliation": "School of Earth and Space Exploration, Arizona State University, Tempe, Arizona, United States",
       "orcid": "0000-0002-5779-5663",
       "type": "ContactPerson"
     },
@@ -29,7 +29,7 @@
     {
       "name": "Amezcua, Kassandra",
       "affiliation": "School of Earth and Space Exploration, Arizona State University, Tempe, Arizona, United States",
-      "orcid": "",
+      "orcid": "0009-0001-1293-3276",
       "type": "DataCurator"
     },
     {
@@ -46,7 +46,7 @@
   "language": "eng",
   "communities": [
     {
-      "identifier": "EoSApplications"
+      "identifier": "eosapplications"
     }
   ],
   "keywords": [

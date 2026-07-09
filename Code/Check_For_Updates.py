@@ -16,8 +16,14 @@ from Message_Manager import Warning_Message, Success_Message
 
 
 
-# Store the user agent used for GitHub API requests
+# Store the user agent used for GitHub/PyPI API requests
 User_Agent = "EoSAlign-update-check"
+
+# Store the PyPI distribution name that actually carries the version number --
+# eosalign/eosholo are dependency-only aliases that pin an exact eosapplications
+# version, so eosapplications is always the real source of truth regardless of
+# which of the three names the user originally pip-installed
+Pypi_Package_Name = "eosapplications"
 
 # Store the fallback version used when no version is configured
 Default_Current_Version = "0.0.0"
@@ -102,6 +108,25 @@ def Get_Github_Release_Api_Url(Application_Id: str) -> str | None:
 
 
 
+# Check whether a specific version of the eosapplications package is actually published
+# on PyPI yet -- a GitHub release can exist before `twine upload` has run, and pip
+# installs can only actually upgrade once PyPI itself has the matching version
+def Is_Version_Published_On_Pypi(Version_Text: str) -> bool:
+
+    Pypi_Url = f"https://pypi.org/pypi/{Pypi_Package_Name}/{Version_Text}/json"
+
+    try:
+        req = urllib.request.Request(Pypi_Url, headers={"User-Agent": User_Agent})
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            # Return whether PyPI reports this exact version as published
+            return resp.status == 200
+    except Exception:
+        # Any failure (404 for an unpublished version, network error, timeout, ...)
+        # is treated the same way: not confirmed as published yet
+        return False
+
+
+
 # Convert a version string into a numeric tuple for comparisons
 def Parse_Version(Version_Text: str) -> tuple:
 
@@ -168,6 +193,13 @@ class Version_Check_Worker(QThread):
 
             # Stop when the installed version is already current or newer
             if Parse_Version(Latest_Tag) <= Parse_Version(Current_Version):
+                self.no_update_available.emit()
+                return
+
+            # Pip installs upgrade via PyPI, not the GitHub release asset -- a release can be
+            # tagged on GitHub before `twine upload` has actually published it, so confirm PyPI
+            # itself has this exact version before telling a pip user to upgrade to it
+            if Is_Pip_Install() and not Is_Version_Published_On_Pypi(Latest_Tag.lstrip("v")):
                 self.no_update_available.emit()
                 return
 

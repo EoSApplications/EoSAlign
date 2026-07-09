@@ -1,13 +1,12 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "EoSAlign: An Open–Source Software for Calculating, Comparing, and Aligning Pressure Under Extreme Conditions"
-abstract: "EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data."
-version: 1.0.0
+title: "EoSAlign: An Open-Source Software for Calculating, Comparing, and Aligning Pressure Under Extreme Conditions"
+abstract: "Allison Pease and Heidi N. Krauss contributed equally to this work and share joint first authorship. EoSAlign is a desktop application designed for comparing and converting pressure calibrations using equations of state (EoS). This application enables the comparison of measured data directly with published calibrations of similar composition and methodology. This application supports both measured data and pressure converted data."
 doi: 10.5281/zenodo.21230860
-date-released: 2026-07-06
+date-released: 2026-07-07
 license: GPL-3.0-only
 repository-code: "https://github.com/EoSApplications/EoSAlign"
-url: "https://github.com/EoSApplications/EoSAlign"
+url: "https://eosalign.com"
 keywords:
   - "Equation of State"
   - "high pressure"
@@ -22,10 +21,3 @@ authors:
     given-names: "Heidi N."
     affiliation: "Department of Earth and Environmental Sciences, Michigan State University, East Lansing, Michigan, United States"
     orcid: "https://orcid.org/0000-0002-2279-6551"
-  - family-names: "Amezcua"
-    given-names: "Kassandra"
-    affiliation: "School of Earth and Space Exploration, Arizona State University, Tempe, Arizona, United States"
-  - family-names: "Shim"
-    given-names: "Sang-Heon"
-    affiliation: "School of Earth and Space Exploration, Arizona State University, Tempe, Arizona, United States"
-    orcid: "https://orcid.org/0000-0001-5203-6038"

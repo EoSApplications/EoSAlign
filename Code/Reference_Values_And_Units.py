@@ -1263,7 +1263,7 @@ Function_Information = {
     # Linear Scale
     ####################
 
-    "Linear Scale": {
+    "Linear Scale - Luminescence": {
         "Display_Name": "Linear Scale",
         "Function_Name": "Linear_Scale__",
         "Calibration_File_EoS_Name": "LinearShift",
@@ -1395,6 +1395,22 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \upsilon \right) = A \left( \frac{ \upsilon - \upsilon_{0} }{ \upsilon_{0} } \right) + B \left( \frac{ \upsilon - \upsilon_{0} }{ \upsilon_{0} } \right)^{2}",
+    },
+
+
+    ####################
+    # Linear Scale
+    ####################
+
+    "Linear Scale - Raman": {
+        "Display_Name": "Linear Scale",
+        "Function_Name": "Linear_Scale__",
+        "Calibration_File_EoS_Name": "LinearShift",
+        "Calibration_File_EoS_Order": None,
+        "Method": "Raman",
+        "Extra_Prep_Work": None,
+        "Unicode_Equation": "",
+        "Latex_Equation": r"P \left( \lambda \right) = \frac{ \lambda - \lambda_{0} }{ A }",
     },
 
 
@@ -1552,11 +1568,11 @@ Calibration_Multiline_Fields = {
 
 # Derived lookups — built automatically from Function_Information, never edit these directly
     # (display_name, order) → display_name  (for looking up from a calibration entry)
-Equation_Entry_From_Calibration_Entry = {(e['Calibration_File_EoS_Name'], e['Calibration_File_EoS_Order']): display_name for display_name, e in Function_Information.items()}
+Equation_Entry_From_Calibration_Entry = {(e['Calibration_File_EoS_Name'], e['Calibration_File_EoS_Order'], e['Method']): display_name for display_name, e in Function_Information.items()}
     # display_name → group_key used by Create_List_Of_Functions_And_Variables  (strips the trailing __)
 EoS_Group_Key = {display_name: e['Function_Name'][:-2] for display_name, e in Function_Information.items()}
     # (yaml_eos, yaml_order) → group_key  (direct replacement for YAML_EOS_TO_..._KEY)
-EoS_Group_Key_From_Calibration = {(e['Calibration_File_EoS_Name'], e['Calibration_File_EoS_Order']): e['Function_Name'][:-2] for e in Function_Information.values()}
+EoS_Group_Key_From_Calibration = {(e['Calibration_File_EoS_Name'], e['Calibration_File_EoS_Order'], e['Method']): e['Function_Name'][:-2] for e in Function_Information.values()}
     # set of yaml_eos names that need special handling (e.g. AP2 volume unit conversion)
 Equation_Required_Extra_Prep_Work = {e['Calibration_File_EoS_Name'] for e in Function_Information.values() if e['Extra_Prep_Work'] is not None}
 

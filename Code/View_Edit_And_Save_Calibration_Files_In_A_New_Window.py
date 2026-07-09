@@ -2258,7 +2258,7 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
                 Full_Eq_Widget.setText('')
             return
         Display_Name = Equation_Entry_From_Calibration_Entry.get(
-            (Data.get('eos'), Data.get('order'))
+            (Data.get('eos'), Data.get('order'), Data.get('method'))
         )
         if Display_Name is None:
             if isinstance(Full_Eq_Widget, (Latex_Equation_Field, Doi_Field, QTextEdit)):
@@ -2437,11 +2437,12 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
             Order_Raw = Data.get('order')
             # Keep None as None (unordered equations); convert integers/strings to str
             Order     = str(Order_Raw) if Order_Raw is not None and Order_Raw != '' else None
-            Display_Name = Equation_Entry_From_Calibration_Entry.get((Eos, Order))
+            Method    = str(Data.get('method', '') or '') or None
+            Display_Name = Equation_Entry_From_Calibration_Entry.get((Eos, Order, Method))
             # Fallback: some equations (e.g. AP2) store Calibration_File_EoS_Order=None even
             # though YAML files may have an 'order' value.  Try matching by EoS name alone.
             if Display_Name is None and Order is not None:
-                Display_Name = Equation_Entry_From_Calibration_Entry.get((Eos, None))
+                Display_Name = Equation_Entry_From_Calibration_Entry.get((Eos, None, Method))
             Idx = Widget.findText(Display_Name) if Display_Name else -1
             Widget.setCurrentIndex(Idx if Idx >= 0 else -1)
 
@@ -2553,7 +2554,7 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
         if not Data:
             return None
         Display_Name = Equation_Entry_From_Calibration_Entry.get(
-            (Data.get('eos'), Data.get('order'))
+            (Data.get('eos'), Data.get('order'), Data.get('method'))
         )
         if Display_Name is None:
             return None

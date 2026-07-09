@@ -2365,25 +2365,15 @@ def Build_EoSHolo_Window():
                             label_font_size=Node_Label_Font_Size
                         )
                         if manual_pos is not None:
-                            # Preserve the user's dragged y-position, but always
-                            # recompute x from the current column layout so the node
-                            # stays inside its correct composition column even when
-                            # the number of visible columns changes.
-                            _, y = manual_pos
+                            # Preserve the user's dragged x/y position as-is,
+                            # just clamped inside the node's composition column
+                            # in case the column layout has shifted since.
+                            x, y = manual_pos
                             comp   = Lookup[NID]['composition']
                             bounds = Col_Bounds.get(comp)
                             if bounds:
                                 left, right, top, bot = bounds
                                 br = item.boundingRect()
-                                node_w = max(1.0, item._r * 2.0)
-                                col_w = max(0.0, right - left)
-                                x = (left + right) / 2
-                                if col_w > (3.0 * node_w):
-                                    mid_left = left + 0.15 * col_w
-                                    mid_right = right - 0.15 * col_w
-                                    if mid_right > mid_left:
-                                        u = Stable_Unit_Float(f"{NID}|{comp}")
-                                        x = mid_left + u * (mid_right - mid_left)
                                 min_x = left - br.left()
                                 max_x = right - br.right()
                                 min_y = top - br.top()

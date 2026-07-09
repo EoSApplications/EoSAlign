@@ -52,10 +52,16 @@ def Get_Equation_Information_For_A_Calibration_Entry(Calibration_Entry):
 
     # Get the order entry from Calibration_File_Variable_Information
     Equation_Order_Dictionary = Calibration_File_Variable_Information.get("Order", {})
+    # Get the method entry from Calibration_File_Variable_Information
+    Equation_Method_Dictionary = Calibration_File_Variable_Information.get("Method", {})
     # Get the calibration file variable name for the order dictionary
     Order_Calibration_File_Variable_Name = Equation_Order_Dictionary.get("Calibration_File_Variable_Name")
     # Check if the calibration file variable name is a list or a single value
     List_Of_Calibration_File_Variable_Names_For_Order = (Order_Calibration_File_Variable_Name if isinstance(Order_Calibration_File_Variable_Name, list) else [Order_Calibration_File_Variable_Name])
+    # Get the calibration file variable name for the method dictionary
+    Method_Calibration_File_Variable_Name = Equation_Method_Dictionary.get("Calibration_File_Variable_Name")
+    # Check if the calibration file variable name is a list or a single value
+    List_Of_Calibration_File_Variable_Names_For_Method = (Method_Calibration_File_Variable_Name if isinstance(Method_Calibration_File_Variable_Name, list) else [Method_Calibration_File_Variable_Name])
     # Create a place to store the calibration file value for the order
     Calibration_File_Value_For_Order = ''
     # Check all calibration file variable names for the order
@@ -70,26 +76,42 @@ def Get_Equation_Information_For_A_Calibration_Entry(Calibration_Entry):
             # Store the calibration file value
             Calibration_File_Value_For_Order = str(Calibration_File_Value)
             break
+    # Check all calibration file variable names for the method
+    Calibration_File_Value_For_Method = ''
+    for List_Entry in List_Of_Calibration_File_Variable_Names_For_Method:
+        if List_Entry is None:
+            # If the list entry is empty skip it
+            continue
+        # Get the calibration file value
+        Calibration_File_Value = Calibration_Entry.get(List_Entry)
+        # Check if there is an acutal value
+        if Calibration_File_Value is not None:
+            # Store the calibration file value
+            Calibration_File_Value_For_Method = str(Calibration_File_Value)
+            break
 
     # Find the Function_Information entry for the equation and order pair from the calibration entry
-    Function_Information_Entry = Equation_Entry_From_Calibration_Entry.get((Calibration_File_Value_For_Equation, Calibration_File_Value_For_Order))
+    Function_Information_Entry = Equation_Entry_From_Calibration_Entry.get((Calibration_File_Value_For_Equation, Calibration_File_Value_For_Order, Calibration_File_Value_For_Method))
     # If nothing was found try setting the order to None
     if Function_Information_Entry is None and Calibration_File_Value_For_Order is not None:
         # Then the equation does not have an order
-        Function_Information_Entry = Equation_Entry_From_Calibration_Entry.get((Calibration_File_Value_For_Equation, None))
+        Function_Information_Entry = Equation_Entry_From_Calibration_Entry.get((Calibration_File_Value_For_Equation, None, Calibration_File_Value_For_Method))
     # If nothing was found search using case insensitive and ignore whitespace and comments
     if Function_Information_Entry is None and Calibration_File_Value_For_Equation:
         # Make the calibration file value for equation all lowercase
         Lowercase_Calibration_File_Value_For_Equation = Calibration_File_Value_For_Equation.lower()
         # Search through all the Function_Information entries
-        for (Function_Information_Entry_Equation_Value, Function_Information_Entry_Order_Value), All_Function_Information_Entries in Equation_Entry_From_Calibration_Entry.items():
+        for (Function_Information_Entry_Equation_Value, Function_Information_Entry_Order_Value, Function_Information_Entry_Method_Value), All_Function_Information_Entries in Equation_Entry_From_Calibration_Entry.items():
             # Check if the case insensitive Function_Information entry equation value matches the calibration file value for equation
             if Function_Information_Entry_Equation_Value is not None and str(Function_Information_Entry_Equation_Value).lower() == Lowercase_Calibration_File_Value_For_Equation:
                 # Check if the Function_Information entry order value matches the calibration file value for order or if the calibration file value for order is None
                 if Function_Information_Entry_Order_Value == Calibration_File_Value_For_Order or Function_Information_Entry_Order_Value is None:
-                    # The matching Function_Information entry has been found
-                    Function_Information_Entry = All_Function_Information_Entries
-                    break
+                    # Check if the Function_Information entry method value matches the calibration file value for method (case insensitive), or if no method was provided
+                        # This matters because multiple equations can share the same equation name and order but differ only by method (e.g. LinearShift for Luminescence vs Raman)
+                    if (not Calibration_File_Value_For_Method) or (Function_Information_Entry_Method_Value is not None and str(Function_Information_Entry_Method_Value).lower() == Calibration_File_Value_For_Method.lower()):
+                        # The matching Function_Information entry has been found
+                        Function_Information_Entry = All_Function_Information_Entries
+                        break
     # If no Function_Information entry was found for the equation and order pair from the calibration entry
     if Function_Information_Entry is None:
         # If the calibration entry had an equation value
@@ -97,7 +119,7 @@ def Get_Equation_Information_For_A_Calibration_Entry(Calibration_Entry):
             # Send an error message that no corresponding equation was found for this calibration entry
             raise ValueError(f"Unknown equation '{Calibration_File_Value_For_Equation}' with order: {Calibration_File_Value_For_Order!r}")
         # There is no matching equation for this calibration entry
-        return Calibration_File_Value_For_Equation, Calibration_File_Value_For_Order, None, None, None
+        return Calibration_File_Value_For_Equation, Calibration_File_Value_For_Order, Calibration_File_Value_For_Method, None, None, None
 
     # Get the Function_Information entry content for the entry assosiated with the calibration entry
     Function_Information_Entry_Content = Function_Information[Function_Information_Entry]
@@ -105,7 +127,7 @@ def Get_Equation_Information_For_A_Calibration_Entry(Calibration_Entry):
         # Remove the trailing __ from the Function_Information entry "Function_Name" so it can later be matched to the correct function in the List_Of_Functions_And_Variables
     List_Of_Functions_And_Variables_Entry = Function_Information_Entry_Content['Function_Name'][:-2]
 
-    return Calibration_File_Value_For_Equation, Calibration_File_Value_For_Order, Function_Information_Entry, Function_Information_Entry_Content, List_Of_Functions_And_Variables_Entry
+    return Calibration_File_Value_For_Equation, Calibration_File_Value_For_Order, Calibration_File_Value_For_Method, Function_Information_Entry, Function_Information_Entry_Content, List_Of_Functions_And_Variables_Entry
 
 
 
@@ -456,7 +478,7 @@ def Build_One_Calibration(Calibration_Entry, File_Key, Is_User_Edited=False, Is_
         # Load the list of functions and variables
         List_Of_Functions_And_Variables = Load_List_Of_Functions_And_Variables()
     # Resolve EoS type, order, and equation entry all together
-    Calibration_File_Value_For_Equation, Calibration_File_Value_For_Order, Function_Information_Entry, Function_Information_Entry_Content, List_Of_Functions_And_Variables_Entry = Get_Equation_Information_For_A_Calibration_Entry(Calibration_Entry)
+    Calibration_File_Value_For_Equation, Calibration_File_Value_For_Order, Calibration_File_Value_For_Method, Function_Information_Entry, Function_Information_Entry_Content, List_Of_Functions_And_Variables_Entry = Get_Equation_Information_For_A_Calibration_Entry(Calibration_Entry)
     # Check if there is an equation entry for the provided calibration file information
     if List_Of_Functions_And_Variables_Entry is None:
         # If there is no equation entry for the provided calibration file information send an error message

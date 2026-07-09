@@ -1,95 +1,259 @@
 # Installing EoSApplications, EoSAlign, and EoSHolo
 
-This page covers everything needed to get `eosapplications`, `eosalign`, and `eosholo` running as terminal commands on Windows, macOS, or Linux, using the included one-command installer script (`install.py`).
+EoSApplications requires Python 3.12.x. Python 3.11 and older and Python 3.13
+and newer are not supported by this release.
 
-No conda, no manual dependency wrangling, and no admin/root privileges are required — `install.py` builds a private Python environment inside this folder and installs everything into it.
+After installation, these commands are available:
 
+```text
+eosapplications
+eosalign
+eosholo
+```
 
-## 1. Install Python (one-time, skip if you already have it)
+Choose one installation method below. Most users should use pipx because it
+creates and manages an isolated environment automatically.
 
-You need Python 3.10 or newer.
+## Option 1: Install with pipx (recommended)
 
-- Windows / macOS: download the installer from [python.org/downloads](https://www.python.org/downloads/) and run it. **On Windows, check the "Add python.exe to PATH" box** on the first install screen — this is required for the next steps to work.
-- Linux: Python 3.10+ is preinstalled on most modern distributions. If not, install it with your package manager, e.g. `sudo apt install python3 python3-venv`.
+pipx creates a private environment for EoSApplications and makes its commands
+available from every terminal. You do not activate the environment yourself.
 
-To confirm it worked, open a terminal and run:
+### Windows
 
-    python --version        # Windows
-    python3 --version       # macOS/Linux
+Install Python 3.12 from [python.org](https://www.python.org/downloads/) and
+select **Add python.exe to PATH** during installation. Then open PowerShell:
 
-Either should print `Python 3.10.x` or higher.
+```powershell
+py -3.12 -m pip install --user pipx
+py -3.12 -m pipx ensurepath
+```
 
+Close and reopen PowerShell, then install EoSApplications:
 
-## 2. Download this repository
+```powershell
+pipx install --python 3.12 eosapplications
+```
 
-Either:
+### macOS
 
-- Click **Code -> Download ZIP** on the GitHub page and extract it somewhere you'll remember (e.g. your Desktop), or
-- Clone it with git:
+Install Python 3.12 from [python.org](https://www.python.org/downloads/) or
+Homebrew. Install pipx and EoSApplications:
 
-      git clone https://github.com/EoSApplications/EoSAlign.git
+```bash
+brew install pipx
+pipx ensurepath
+pipx install --python 3.12 eosapplications
+```
 
-Either way, you should end up with a folder (e.g. `EoSAlign`) that directly contains this `INSTALL.md` file, `install.py`, a `Code` folder, and so on.
+Close and reopen the terminal after `pipx ensurepath` if the commands are not
+found immediately.
 
+### Linux
 
-## 3. Run the installer
+Install Python 3.12, its `venv` support, and pipx with your distribution's
+package manager. For Ubuntu:
 
-Open a terminal **inside that folder** and run:
+```bash
+sudo apt update
+sudo apt install python3.12 python3.12-venv pipx
+pipx ensurepath
+pipx install --python 3.12 eosapplications
+```
 
-    python install.py        # Windows
-    python3 install.py       # macOS/Linux
+Package names vary by Linux distribution.
 
-This single script:
+### Update or uninstall a pipx installation
 
-1. Creates a private virtual environment — on macOS/Linux, in a new `.venv` folder here; on Windows, in `%LOCALAPPDATA%\EoSApplications\venv` instead (PySide6's installed files include very deeply nested paths that can exceed Windows' path-length limit if the environment lives inside a long, deeply-nested download location, so it's kept in a short, fixed spot instead). Either way, it does not touch your system Python or any other project.
-2. Installs every package listed in [requirements.txt](requirements.txt) into that environment (PySide6, numpy, pandas, matplotlib, pillow, scipy, networkx, plotly, pyyaml, darkdetect).
-3. Generates `eosapplications`, `eosalign`, and `eosholo` launcher commands into a new `Command_Line_Interface` folder here.
-4. Adds that folder to your PATH (a per-user PATH change on Windows; a symlink into `/usr/local/bin` or `~/.local/bin` on macOS/Linux) so those commands work from any terminal.
+```text
+pipx upgrade eosapplications
+pipx uninstall eosapplications
+```
 
-This takes a few minutes the first time, mostly spent downloading packages.
+To delete downloaded calibration updates and other user data, run
+`eosapplications-cleanup` before uninstalling.
 
+## Option 2: Install with pip in a virtual environment
 
-## 4. Open a new terminal and run the apps
+This method gives you direct control over the environment. You must activate
+the environment again whenever you open a new terminal before running the
+applications.
 
-PATH changes only apply to terminals opened *after* the installer ran, so close and reopen your terminal, then run any of:
+### Windows PowerShell
 
-    eosapplications      # the launcher hub for all three apps
-    eosalign              # EoSAlign directly
-    eosholo                # EoSHolo directly
+```powershell
+py -3.12 -m venv eosapplications-env
+.\eosapplications-env\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install eosapplications
+```
 
+The claimed-name aliases install the same suite:
 
-## Updating
+```text
+python -m pip install eosalign
+python -m pip install eosholo
+```
 
-If you download a newer copy of this repository (or `git pull`), just run `python install.py` (or `python3 install.py`) again from inside it. It rebuilds the environment and commands from scratch and safely overwrites its own PATH entry rather than duplicating it — you don't need to remove anything first.
+For later sessions, return to the folder containing the environment and run:
 
+```powershell
+.\eosapplications-env\Scripts\Activate.ps1
+eosalign
+```
 
-## Uninstalling
+### Windows Command Prompt
 
-1. Remove the command shortcuts and environment the installer created:
-   - Windows: delete the `Command_Line_Interface` subfolder from the repository (step 3 below removes the rest of it anyway), and delete `%LOCALAPPDATA%\EoSApplications` (the private environment). The PATH entry pointing at `Command_Line_Interface` is harmless once that folder is gone, but if you'd like to remove it too: Settings -> "Edit environment variables for your account" -> select `Path` -> Edit -> remove the entry ending in `Command_Line_Interface`.
-   - macOS/Linux: delete the symlinks the installer created:
+```bat
+py -3.12 -m venv eosapplications-env
+eosapplications-env\Scripts\activate.bat
+python -m pip install --upgrade pip
+python -m pip install eosapplications
+```
 
-         rm /usr/local/bin/eosapplications /usr/local/bin/eosalign /usr/local/bin/eosholo /usr/local/bin/eosapplications-cleanup
+For later sessions:
 
-     (If the installer had to fall back to `~/.local/bin` instead, delete them from there.)
-2. If you have data you entered or calibration updates you downloaded and want them wiped too, run `eosapplications-cleanup` **before** deleting anything (it asks for confirmation, then deletes the app's user data folder).
-3. Delete the downloaded/cloned repository folder.
+```bat
+eosapplications-env\Scripts\activate.bat
+eosalign
+```
 
+### macOS or Linux
+
+```bash
+python3.12 -m venv eosapplications-env
+source eosapplications-env/bin/activate
+python -m pip install --upgrade pip
+python -m pip install eosapplications
+```
+
+For later sessions, return to the folder containing the environment and run:
+
+```bash
+source eosapplications-env/bin/activate
+eosalign
+```
+
+To leave an activated environment:
+
+```text
+deactivate
+```
+
+To update the application while the environment is active:
+
+```text
+python -m pip install --upgrade eosapplications
+```
+
+To uninstall it, run `eosapplications-cleanup` first if you also want to delete
+user data, then run:
+
+```text
+python -m pip uninstall eosapplications
+```
+
+The environment folder can be deleted after deactivation.
+
+## Option 3: Download or clone the source repository
+
+Use this method to run the checked-out source files. The included `install.py`
+script creates a private environment, installs the exact dependencies from
+`requirements.txt`, and creates launcher commands.
+
+### Install Python
+
+Install Python 3.12 from [python.org](https://www.python.org/downloads/).
+On Windows, select **Add python.exe to PATH**.
+
+Confirm the version:
+
+```powershell
+py -3.12 --version
+```
+
+```bash
+python3.12 --version
+```
+
+The result must begin with `Python 3.12`.
+
+### Download or clone
+
+Either select **Code -> Download ZIP** on GitHub and extract the archive, or:
+
+```text
+git clone https://github.com/EoSApplications/EoSAlign.git
+```
+
+Open a terminal in the resulting `EoSAlign` folder.
+
+### Run install.py
+
+Windows:
+
+```powershell
+py -3.12 install.py
+```
+
+macOS or Linux:
+
+```bash
+python3.12 install.py
+```
+
+The script:
+
+1. Verifies that Python 3.12 is being used.
+2. Creates a private virtual environment.
+3. Installs PySide6, NumPy, pandas, Matplotlib, Pillow, SciPy, PyYAML,
+   darkdetect, dill, and lmfit at the tested versions.
+4. Creates the `eosapplications`, `eosalign`, `eosholo`, and
+   `eosapplications-cleanup` commands.
+5. Adds those commands to the user PATH.
+
+Close and reopen the terminal after installation, then run any application
+command.
+
+### Update or uninstall a source installation
+
+After downloading a newer copy or running `git pull`, rerun `install.py`.
+
+Before removing the repository, run `eosapplications-cleanup` if you also want
+to delete downloaded calibration updates and other user data.
+
+On Windows, remove the repository and
+`%LOCALAPPDATA%\EoSApplications\venv`. You can also remove the repository's
+`Command_Line_Interface` entry from your user PATH.
+
+On macOS or Linux, remove the generated command links from `/usr/local/bin` or
+`~/.local/bin`, then delete the repository and its `.venv` folder.
 
 ## Troubleshooting
 
-**`'python' is not recognized` / `command not found: python3`**
-Python isn't installed, or (on Windows) wasn't added to PATH during installation. Reinstall Python from [python.org/downloads](https://www.python.org/downloads/) and make sure "Add python.exe to PATH" is checked.
+### Python 3.12 is not found
 
-**`eosalign`/`eosholo`/`eosapplications` still not found after installing**
-Make sure you opened a *new* terminal window after running `install.py` — PATH changes never apply to terminals that were already open.
+Install Python 3.12 and make sure it is available as `py -3.12` on Windows or
+`python3.12` on macOS/Linux.
 
-**Installer says a newer Python is required**
-Your default `python`/`python3` points at an older version. Install Python 3.10+ from [python.org/downloads](https://www.python.org/downloads/), then re-run `install.py` (on Windows, the installer offers to make the new version the default; on macOS/Linux you may need to invoke it explicitly, e.g. `python3.12 install.py`).
+### PowerShell blocks Activate.ps1
 
-**macOS/Linux: installer asks for your password**
-This only happens if `/usr/local/bin` isn't writable without elevated privileges — the installer uses `sudo` once to place the command shortcuts there. If you'd rather not enter a password, cancel and it will fall back to `~/.local/bin` on the next run (make sure that folder is on your PATH, per the note the installer prints).
+Use the Windows Command Prompt instructions, or run the environment's Python
+without activation:
 
+```powershell
+.\eosapplications-env\Scripts\eosalign.exe
+```
 
+### A command is not found after pipx or install.py
 
+Close and reopen the terminal so the updated PATH is loaded. For pipx, rerun:
 
+```text
+pipx ensurepath
+```
+
+### Linux reports that venv or pip is missing
+
+Install your distribution's Python 3.12 `venv` and pip packages. On Ubuntu,
+these are commonly named `python3.12-venv` and `python3-pip`.
