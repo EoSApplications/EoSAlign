@@ -300,14 +300,6 @@ Equation_Required_Entry_Keys = {
 
 
 
-# No-scroll combo box
-
-# Display a combo box that ignores scroll-wheel events to avoid accidental selection changes
-class No_Scroll_Combo_Box(QComboBox):
-    def wheelEvent(self, event):
-        event.ignore()
-
-
 
 
 # Unit-labelled line edit
@@ -366,10 +358,15 @@ class V0_Field(QWidget):
         self.Unit_Label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         Layout.addWidget(self.Unit_Label)
 
-        self.Unit_Combo = No_Scroll_Combo_Box()
+        self.Unit_Combo = Dropdown()
         self.Unit_Combo.setObjectName('Dropdown')
         self.Unit_Combo.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.Unit_Combo.setVisible(False)
+        # Without a delegate, the default one doesn't know the QSS gives popup items
+            # margin/padding, so rows leave no room for the rounded/hover styling to show
+        self.Unit_Combo.view().setItemDelegate(
+            WordWrapDelegate(self.Unit_Combo.view(), self.Unit_Combo)
+        )
         for Entry_Key in ('V0', 'V0 per Formula Unit', 'V0 per Atom', 'V0 per Centimeter Cubed per Mole'):
             self.Unit_Combo.addItem(V0_Entry_Key_To_Unit_Text[Entry_Key], Entry_Key)
         self.Unit_Combo.currentIndexChanged.connect(self.On_Unit_Changed)
@@ -1191,10 +1188,13 @@ class Composition_Container(QWidget):
         Layout.setSpacing(2)
 
         # dropdown of known materials
-        self.combo = No_Scroll_Combo_Box()
+        self.combo = Dropdown()
         self.combo.setObjectName('Dropdown')
         self.combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.combo.setPlaceholderText('Select a composition')
+        # Without a delegate, the default one doesn't know the QSS gives popup items
+            # margin/padding, so rows leave no room for the rounded/hover styling to show
+        self.combo.view().setItemDelegate(WordWrapDelegate(self.combo.view(), self.combo))
 
         Seen_Labels = set()
         for Key, Entry in Material_Information.items():
@@ -1328,9 +1328,12 @@ class Reference_Entry(QWidget):
             self.Field_Labels[calibration_key] = lbl
 
             if calibration_key == 'cal_to_is_K0_fixed':
-                widget = No_Scroll_Combo_Box()
+                widget = Dropdown()
                 widget.setObjectName('Dropdown')
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                # Without a delegate, the default one doesn't know the QSS gives popup items
+                    # margin/padding, so rows leave no room for the rounded/hover styling to show
+                widget.view().setItemDelegate(WordWrapDelegate(widget.view(), widget))
                 widget.addItem('Select yes or no', '')
                 widget.addItem('Yes', 'yes')
                 widget.addItem('No',  'no')
@@ -1649,11 +1652,18 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
         Composition_Label.setObjectName('CollapsibleTitle')
         Row.addWidget(Composition_Label)
 
-        self.Composition_Selector = No_Scroll_Combo_Box()
+        self.Composition_Selector = Dropdown()
         self.Composition_Selector.setObjectName('Dropdown')
-        self.Composition_Selector.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.Composition_Selector.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.Composition_Selector.setMaxVisibleItems(20)
         self.Composition_Selector.setPlaceholderText('Select a composition')
+        # Without a delegate, Qt's default item delegate has no idea the QSS gives popup
+            # items margin/padding (margin: 4px 8px; padding: 8px 16px in Dropdowns.qss), so
+            # each row's rect leaves no room for the rounded corners/hover highlight to show --
+            # WordWrapDelegate's sizeHint() bakes that inset in, exactly as Study_Selector uses below
+        self.Composition_Selector.view().setItemDelegate(
+            WordWrapDelegate(self.Composition_Selector.view(), self.Composition_Selector)
+        )
         for Composition_Key in self.Get_Available_Composition_Keys():
             Display_Label = Material_Information.get(Composition_Key, {}).get('Display_Label', Composition_Key)
             self.Composition_Selector.addItem(Display_Label, Composition_Key)
@@ -2028,9 +2038,12 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
 
     def Create_Combo_Widget(self, Entry_Key, Method):
         """Create and configure a QComboBox for the given entry key."""
-        Combo = No_Scroll_Combo_Box()
+        Combo = Dropdown()
         Combo.setObjectName('Dropdown')
         Combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        # Without a delegate, the default one doesn't know the QSS gives popup items
+            # margin/padding, so rows leave no room for the rounded/hover styling to show
+        Combo.view().setItemDelegate(WordWrapDelegate(Combo.view(), Combo))
 
         if Entry_Key == 'Equation of State':
             self.Build_Equation_Combo_Items(Combo, Method_Filter=Method)
@@ -2071,7 +2084,7 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
         Combo.setPlaceholderText('Select an equation')
 
         Restore_Index = -1
-        for Display_Name, Info in Function_Information.items():
+        for Function_Information_Key, Info in Function_Information.items():
             if Method_Filter is not None and Info['Method'] != Method_Filter:
                 continue
             Item_Data = {
@@ -2079,12 +2092,36 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
                 'order':  Info['Calibration_File_EoS_Order'],
                 'method': Info['Method'],
             }
-            Combo.addItem(Display_Name, Item_Data)
+            # Show the display name, not the Function_Information dict key -- the two can differ
+                # (e.g. "Linear Scale - Luminescence" / "Linear Scale - Raman" both display as
+                # "Linear Scale"), since the key exists only to disambiguate equations that share
+                # a display name but differ by method
+            Combo.addItem(Info['Display_Name'], Item_Data)
             if Item_Data['eos'] == Current_Eos and Item_Data['order'] == Current_Order:
                 Restore_Index = Combo.count() - 1
 
         Combo.setCurrentIndex(Restore_Index)
         Combo.blockSignals(False)
+
+
+    def Find_Equation_Combo_Index(self, Widget, Eos, Order, Method):
+        """Find the equation combo index whose item data matches the given eos/order/method.
+        Falls back to matching eos+method alone when no exact order match exists (e.g. AP2
+        stores Calibration_File_EoS_Order=None even though some YAML files carry an 'order'
+        value).
+        """
+        Fallback_Index = -1
+        for Index in range(Widget.count()):
+            Item_Data = Widget.itemData(Index) or {}
+            if Item_Data.get('eos') != Eos:
+                continue
+            if Method is not None and Item_Data.get('method') != Method:
+                continue
+            if Item_Data.get('order') == Order:
+                return Index
+            if Item_Data.get('order') is None and Fallback_Index == -1:
+                Fallback_Index = Index
+        return Fallback_Index
 
 
     def Rebuild_Form(self, Method):
@@ -2438,12 +2475,10 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
             # Keep None as None (unordered equations); convert integers/strings to str
             Order     = str(Order_Raw) if Order_Raw is not None and Order_Raw != '' else None
             Method    = str(Data.get('method', '') or '') or None
-            Display_Name = Equation_Entry_From_Calibration_Entry.get((Eos, Order, Method))
-            # Fallback: some equations (e.g. AP2) store Calibration_File_EoS_Order=None even
-            # though YAML files may have an 'order' value.  Try matching by EoS name alone.
-            if Display_Name is None and Order is not None:
-                Display_Name = Equation_Entry_From_Calibration_Entry.get((Eos, None, Method))
-            Idx = Widget.findText(Display_Name) if Display_Name else -1
+            # Match against the combo item's stored eos/order/method rather than its displayed
+                # text -- multiple equations (e.g. Linear Scale for Luminescence vs Raman) share
+                # the same Display_Name, so findText() on the label can no longer disambiguate them
+            Idx = self.Find_Equation_Combo_Index(Widget, Eos, Order, Method)
             Widget.setCurrentIndex(Idx if Idx >= 0 else -1)
 
         elif Entry_Key == 'Method':
@@ -2470,7 +2505,13 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
 
     def Populate_Composition_Field(self, Container, Data):
         """Populate the Composition_Container from YAML data."""
-        Comp_Key    = str(Data.get('composition', '') or '')
+        Comp_Key = str(Data.get('composition', '') or '').strip()
+        # Mirror the canonicalization Build_One_Calibration applies in Parse_Calibration_Information.py --
+            # calibration YAML files commonly store the diamond composition in lowercase, but
+            # Material_Information only has a 'Diamond' entry, so without this the dropdown falls
+            # back to its free-text mode (looking unstyled) for every diamond calibration
+        if Comp_Key == 'diamond':
+            Comp_Key = 'Diamond'
         Display_Val = Material_Information.get(Comp_Key, {}).get('Display_Label', Comp_Key)
         Container.populate(Comp_Key, Display_Val)
 

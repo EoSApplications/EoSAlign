@@ -1265,7 +1265,7 @@ Function_Information = {
 
     "Linear Scale - Luminescence": {
         "Display_Name": "Linear Scale",
-        "Function_Name": "Linear_Scale__",
+        "Function_Name": "Linear_Scale__Luminescence__",
         "Calibration_File_EoS_Name": "LinearShift",
         "Calibration_File_EoS_Order": None,
         "Method": "Luminescence",
@@ -1404,7 +1404,7 @@ Function_Information = {
 
     "Linear Scale - Raman": {
         "Display_Name": "Linear Scale",
-        "Function_Name": "Linear_Scale__",
+        "Function_Name": "Linear_Scale__Raman__",
         "Calibration_File_EoS_Name": "LinearShift",
         "Calibration_File_EoS_Order": None,
         "Method": "Raman",
@@ -1507,7 +1507,7 @@ Calibration_Field_Sections = {
 
     "Study Information": [
         "Study", "Composition", "Method", "Technique", "Catagory",
-        "Atomic Number", "DOI", "Data Quality Notes", "Notes", "Last Edited",
+        "Atomic Number", "DOI", "Last Edited",
     ],
 
     "Equation of State": [
@@ -1550,7 +1550,8 @@ Calibration_Field_Sections = {
     "Experimental Setup": [
         "Diamond Anvil Cell Type", "Culet Size", "Gasket Material",
         "Pressure Transmitting Medium", "Synchrotron Facility", "Peaks Used",
-        "Reference Temperature", "Temperature Range", "Pressure Range", "Sample Heating",
+        "Reference Temperature", "Temperature Range", "Pressure Range", "Sample Heating", 
+        "Data Quality Notes", "Notes",
     ],
 
 }

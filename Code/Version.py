@@ -26,7 +26,7 @@ Applications = {
         "Github_Owner": "EoSApplications",
         "Github_Repository": "EoSAlign",
         "Platform_Assets": {
-            "win32": "EoSApplications_Windows.exe",
+            "win32": "EoSApplications__Windows__x86_64.exe",
             "darwin": "EoSApplications_Mac.dmg",
             "linux": "EoSApplications_Linux.AppImage",
         },
@@ -40,7 +40,7 @@ Applications = {
         "Github_Owner": "EoSApplications",
         "Github_Repository": "EoSAlign",
         "Platform_Assets": {
-            "win32": "EoSApplications_Windows.exe",
+            "win32": "EoSApplications__Windows__x86_64.exe",
             "darwin": "EoSApplications_Mac.dmg",
             "linux": "EoSApplications_Linux.AppImage",
         },
@@ -53,7 +53,7 @@ Applications = {
         "Github_Owner": "EoSApplications",
         "Github_Repository": "EoSAlign",
         "Platform_Assets": {
-            "win32": "EoSApplications_Windows.exe",
+            "win32": "EoSApplications__Windows__x86_64.exe",
             "darwin": "EoSApplications_Mac.dmg",
             "linux": "EoSApplications_Linux.AppImage",
         },
@@ -66,7 +66,7 @@ Applications = {
         "Github_Owner": "EoSApplications",
         "Github_Repository": "EoSAlign",
         "Platform_Assets": {
-            "win32": "EoSApplications_Windows.exe",
+            "win32": "EoSApplications__Windows__x86_64.exe",
             "darwin": "EoSApplications_Mac.dmg",
             "linux": "EoSApplications_Linux.AppImage",
         },

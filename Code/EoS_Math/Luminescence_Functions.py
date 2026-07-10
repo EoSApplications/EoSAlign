@@ -27,7 +27,7 @@ from scipy.optimize import brentq
 ####################
 
 # Calculate pressure from a peak position
-def Linear_Scale__Calculate_Pressure_from_Peak_Position(
+def Linear_Scale__Luminescence__Calculate_Pressure_from_Peak_Position(
     Peak_Position_At_A_Pressure,
     Initial_Peak_Position__Nanometers,
     Slope_Of_Peak_Position_Change_With_Pressure):
@@ -40,7 +40,7 @@ def Linear_Scale__Calculate_Pressure_from_Peak_Position(
     return Pressure
 
 # Calculate peak position from a pressure
-def Linear_Scale__Calculate_Peak_Position_from_Pressure(
+def Linear_Scale__Luminescence__Calculate_Peak_Position_from_Pressure(
     Pressure,
     Initial_Peak_Position__Nanometers,
     Slope_Of_Peak_Position_Change_With_Pressure):

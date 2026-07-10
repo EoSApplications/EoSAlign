@@ -294,6 +294,42 @@ def Eremets_et_al_2023__Diamond__Calculate_Wavenumber_From_A_Pressure(
 
 
 
+####################
+# Linear Scale
+
+    # P(λ) = (λ - λ₀) / A
+####################
+
+# Calculate pressure from a wavenumber
+def Linear_Scale__Raman__Calculate_Pressure_from_Wavenumber(
+    Wavenumber,
+    Initial_Peak_Position__Wavenumber,
+    Slope_Of_Peak_Position_Change_With_Pressure):
+
+    # Linear Scale
+        # Historically used in initial ruby fluourescence studies
+        # Commonly used for materials that do not require higher order expansions
+    Pressure = (Wavenumber - Initial_Peak_Position__Wavenumber) / Slope_Of_Peak_Position_Change_With_Pressure
+
+    return Pressure
+
+# Calculate wavenumber from a pressure
+def Linear_Scale__Raman__Calculate_Wavenumber_from_Pressure(
+    Pressure,
+    Initial_Peak_Position__Wavenumber,
+    Slope_Of_Peak_Position_Change_With_Pressure):
+
+    # Start with the equation for calculating pressure from a wavenumber and rearrange to calculate wavenumber
+        # Pressure = (Wavenumber - Initial_Peak_Position__Wavenumber) / Slope_Of_Peak_Position_Change_With_Pressure
+    # Multiply both sides by Slope_Of_Peak_Position_Change_With_Pressure
+        # Pressure * Slope_Of_Peak_Position_Change_With_Pressure = Wavenumber - Initial_Peak_Position__Wavenumber
+    # Add Initial_Peak_Position__Wavenumber to both sides
+        # Pressure * Slope_Of_Peak_Position_Change_With_Pressure + Initial_Peak_Position__Wavenumber = Wavenumber
+    Wavenumber = (Pressure * Slope_Of_Peak_Position_Change_With_Pressure) + Initial_Peak_Position__Wavenumber
+
+    return Wavenumber
+
+
 
 ########################################
 # Study Specific

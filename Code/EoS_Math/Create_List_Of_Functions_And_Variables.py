@@ -1,6 +1,7 @@
 # Load libraries
     # Load standard libraries
 import os
+import sys
 import inspect
 import importlib.util
 import datetime
@@ -9,17 +10,27 @@ from . import XRD_Functions
 from . import Luminescence_Functions
 from . import Raman_Functions
 from Reference_Values_And_Units import *
+    # Load the user's writable application data folder -- the generated cache file below
+    # can't be written next to this module's own __file__ in a frozen build (PyInstaller
+    # packs pure-python modules into an archive, so that directory doesn't exist on disk)
+from .Load_Calibration_Files import User_Application_Data_Folder, Get_Current_Application_Version_For_Cache
 
 
 
 
 
-# Find the path to this file
+# Find the path to this file -- still used below to look for the source Function_Files
+# (Create_List_Of_Functions_And_Variables_File_Path -> matches Load_Calibration_Files's
+# pattern - only needed for the staleness mtime check, which degrades gracefully to
+# "not found" in a frozen build rather than crashing)
 Create_List_Of_Functions_And_Variables_File_Path = os.path.dirname(os.path.abspath(__file__))
 # Define the name of the file that will store the list of functions and variables
-List_Of_Functions_And_Variables_File_Name = 'List_Of_Functions_And_Variables.py'
-# Set the path of the list of functions and variables file
-List_Of_Functions_And_Variables_File = os.path.join(Create_List_Of_Functions_And_Variables_File_Path, List_Of_Functions_And_Variables_File_Name)
+    # Leading dot for Unix-style hidden files -- Windows needs the FILE_ATTRIBUTE_HIDDEN
+    # flag set explicitly too, see the Save function below (matches the calibration cache)
+List_Of_Functions_And_Variables_File_Name = '.List_Of_Functions_And_Variables.py'
+# Set the path of the list of functions and variables file -- stored in the user's writable
+# application data folder rather than next to this module's own source (see import comment above)
+List_Of_Functions_And_Variables_File = os.path.join(User_Application_Data_Folder, List_Of_Functions_And_Variables_File_Name)
 
 # Make a list of all files that contain Equation of State functions and calibration functions
 Function_Files = [
@@ -315,6 +326,12 @@ def Save_List_Of_Functions_And_Variables_To_File(List_Of_Functions_And_Variables
     File_Content.append(f"# Source files scanned:")
     File_Content.append(f"{Function_File_Mtimes}")
     File_Content.append(f"")
+    # Stamp the cache with the application version that built it -- this is what actually protects
+        # installed/frozen builds. The mtime staleness check above degrades to "not found" once the
+        # source Function_Files are packed into a frozen build's archive, so without this stamp a
+        # user's existing cache would never be rebuilt after installing an update with new equations
+    File_Content.append(f"List_Of_Functions_And_Variables_Application_Version = {Get_Current_Application_Version_For_Cache()!r}")
+    File_Content.append(f"")
     File_Content.append(f"List_Of_Functions_And_Variables_DATA = {{")
 
     # List the order in which the function files should be listed
@@ -356,10 +373,22 @@ def Save_List_Of_Functions_And_Variables_To_File(List_Of_Functions_And_Variables
         Temperary_File.write('\n'.join(File_Content))
     # Move the temperary file to the actual file path
     os.replace(Temperary_File_Path, File_Path)
+    # Hide the file on Windows (dot-prefix is sufficient on macOS/Linux)
+    if sys.platform == 'win32':
+        try:
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            existing = kernel32.GetFileAttributesW(File_Path)
+            if existing != 0xFFFFFFFF:
+                kernel32.SetFileAttributesW(File_Path, existing | 0x02)
+        except Exception:
+            pass
 
 
 
 # Load the list of functions and variables from the file and resolve function names back to actual function objects using Function_Modules
+    # Returns None (instead of raising) if the file cannot be loaded, is corrupted, or was built by
+    # a different application version -- see the version-stamp comment in Save_List_Of_Functions_And_Variables_To_File
 def Load_List_Of_Functions_And_Variables_From_File(File_Path=None):
 
     # Check if a file path was inputed
@@ -367,37 +396,69 @@ def Load_List_Of_Functions_And_Variables_From_File(File_Path=None):
         # Use the default file path if one is not provided
         File_Path = List_Of_Functions_And_Variables_File
 
-    # Load the .py file as a module without adding it to sys.modules
-    File_Information = importlib.util.spec_from_file_location('List_Of_Functions_And_Variables', File_Path)
-    Function = importlib.util.module_from_spec(File_Information)
-    File_Information.loader.exec_module(Function)
-    Information_From_Saved_File = Function.List_Of_Functions_And_Variables_DATA
+    try:
+        # Load the .py file as a module without adding it to sys.modules
+        File_Information = importlib.util.spec_from_file_location('List_Of_Functions_And_Variables', File_Path)
+        Function = importlib.util.module_from_spec(File_Information)
+        File_Information.loader.exec_module(Function)
+        Information_From_Saved_File = Function.List_Of_Functions_And_Variables_DATA
 
-    # Make a place to store the list of functions and variables with the function names resolved to actual function objects
-    List_Of_Functions_And_Variables = {}
+        # Check if the cache was built by a different application version -- catches a cache left
+            # over from a previous install, which the mtime staleness check cannot detect on its own
+        Cached_Application_Version = getattr(Function, 'List_Of_Functions_And_Variables_Application_Version', None)
+        if Cached_Application_Version != Get_Current_Application_Version_For_Cache():
+            print("[List Of Functions And Variables] Application version changed, rebuilding...")
+            return None
 
-    # Find each equation/function from the file
-    for Equation_Name, Entry in Information_From_Saved_File.items():
-        List_Of_Functions_And_Variables[Equation_Name] = dict(Entry)
-        # Get the forward function object from the module and function name
-        Forward_Function = Function_Modules.get(Entry.get('Forward_Module', ''))
-        if Forward_Function is not None:
-            List_Of_Functions_And_Variables[Equation_Name]['Forward_Function'] = getattr(Forward_Function, Entry.get('Forward_Function_Name', ''), None)
-        # Get the inverse function object from the module and function name
-        Inverse_Function = Function_Modules.get(Entry.get('Inverse_Module', ''))
-        if Inverse_Function is not None:
-            List_Of_Functions_And_Variables[Equation_Name]['Inverse_Function'] = getattr(Inverse_Function, Entry.get('Inverse_Function_Name', ''), None)
-    # Check if any equations/functions could not be found
-    Missing_Functions = [
-        Name for Name, Entry in List_Of_Functions_And_Variables.items()
-        if Entry.get('Forward_Function') is None or Entry.get('Inverse_Function') is None
-    ]
-    # Send a warning for any equations/functions that could not be found
-    if Missing_Functions:
-        print(f"Warning: could not resolve function references for: {Missing_Functions}")
+        # Make a place to store the list of functions and variables with the function names resolved to actual function objects
+        List_Of_Functions_And_Variables = {}
 
-    return List_Of_Functions_And_Variables
+        # Find each equation/function from the file
+        for Equation_Name, Entry in Information_From_Saved_File.items():
+            List_Of_Functions_And_Variables[Equation_Name] = dict(Entry)
+            # Get the forward function object from the module and function name
+            Forward_Function = Function_Modules.get(Entry.get('Forward_Module', ''))
+            if Forward_Function is not None:
+                List_Of_Functions_And_Variables[Equation_Name]['Forward_Function'] = getattr(Forward_Function, Entry.get('Forward_Function_Name', ''), None)
+            # Get the inverse function object from the module and function name
+            Inverse_Function = Function_Modules.get(Entry.get('Inverse_Module', ''))
+            if Inverse_Function is not None:
+                List_Of_Functions_And_Variables[Equation_Name]['Inverse_Function'] = getattr(Inverse_Function, Entry.get('Inverse_Function_Name', ''), None)
+        # Check if any equations/functions could not be found
+        Missing_Functions = [
+            Name for Name, Entry in List_Of_Functions_And_Variables.items()
+            if Entry.get('Forward_Function') is None or Entry.get('Inverse_Function') is None
+        ]
+        # Send a warning for any equations/functions that could not be found
+        if Missing_Functions:
+            print(f"Warning: could not resolve function references for: {Missing_Functions}")
 
+        return List_Of_Functions_And_Variables
+    except Exception as exc:
+        # The cache file is missing an expected attribute, is corrupted, or otherwise unreadable
+        print(f"[List Of Functions And Variables] Cache corrupted ({exc}), rebuilding...")
+        return None
+
+
+
+
+# Remove the list of functions and variables cache file from disk
+    # Called whenever the cache turns out to be missing, stale, corrupted, or built by a different
+    # application version, so a known-bad file is never left behind to be mistaken for valid (or
+    # silently reused by another code path) if the rebuild that follows fails partway through
+def Remove_List_Of_Functions_And_Variables_File(File_Path=None):
+
+    # Check if a file path was inputed
+    if File_Path is None:
+        # Use the default file path if one is not provided
+        File_Path = List_Of_Functions_And_Variables_File
+
+    try:
+        # Remove the file if it exists
+        if os.path.exists(File_Path):
+            os.remove(File_Path)
+    except OSError:
+        pass
 
 
 
@@ -406,12 +467,14 @@ def Load_List_Of_Functions_And_Variables(Force_Rebuild=False):
 
     # Use the current list of functions and variables file if it is valid and a rebuild has not been forced
     if not Force_Rebuild and Check_If_The_Current_List_Of_Functions_And_Variables_Is_Valid():
-        try:
-            # Load the list of functions and variables from the file
-            return Load_List_Of_Functions_And_Variables_From_File()
-        except Exception:
-            # The file is corrupted or unreadable
-            pass
+        # Load the list of functions and variables from the file
+        List_Of_Functions_And_Variables = Load_List_Of_Functions_And_Variables_From_File()
+        if List_Of_Functions_And_Variables is not None:
+            return List_Of_Functions_And_Variables
+
+    # Anything on disk at this point is missing, stale, corrupted, or built by a different
+        # application version -- remove it before rebuilding
+    Remove_List_Of_Functions_And_Variables_File()
 
     # Rebuild the list of functions and variables by scanning the EoS modules
     List_Of_Functions_And_Variables = Create_List_Of_Functions_And_Variables_From_Function_Files(*Function_Modules.values())
