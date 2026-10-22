@@ -4,13 +4,11 @@ import numpy as np
 import pandas as pd
     # Load local libraries
 try:
-    from ..Reference_Values_And_Units import Material_Information, Equation_Required_Extra_Prep_Work, Calibration_Key_To_Entry_Key, Calibration_File_Variable_Information
+    from ..Reference_Values_And_Units import Calibration_Key_To_Entry_Key, Calibration_File_Variable_Information
 except ImportError:
-    from Reference_Values_And_Units import Material_Information, Equation_Required_Extra_Prep_Work, Calibration_Key_To_Entry_Key, Calibration_File_Variable_Information
-from .Parse_Calibration_Information import (
-    Store_The_Forward_Or_Inverse_Function_For_An_Equation as _Build_Generic_Closure,
-    Store_The_Forward_Or_Inverse_Function_For_The_Adaptive_Polynomial_Equation as _Build_AP2_Closure_Pair,
-)
+    from Reference_Values_And_Units import Calibration_Key_To_Entry_Key, Calibration_File_Variable_Information
+from .Build_Equation_Functions import Build_The_Functions_For_An_Equation
+from .Custom_Reference import Apply_The_Custom_Reference
 
 
 
@@ -123,28 +121,14 @@ def _Apply_Custom_Reference(Metadata, Custom_Reference):
     if Custom_Value is None:
         return Metadata
 
-    Equation_Type = Metadata.get('Equation of State', '')
-    Composition = (Metadata.get('Composition') or '').strip()
-
     # All reference values are stored under their Calibration_File_Variable_Information display keys.
     # 'V0' is the display key for V0 (XRD), lambda_0 (Luminescence), and nu_0 (Raman).
     # 'V0 Uncertainty' is the corresponding uncertainty display key.
-    if Reference_Type == 'V0':
-        if Equation_Type in Equation_Required_Extra_Prep_Work:
-            Atoms_Per_Unit_Cell = ((Material_Information.get(Composition) or {}).get('Formula_Units', 1) * ((Material_Information.get(Composition) or {}).get('Atoms_Per_Formula_Unit', None) or 1))
-            Metadata['V0'] = Custom_Value / Atoms_Per_Unit_Cell
-            Metadata['V0 Uncertainty'] = Custom_Uncertainty / Atoms_Per_Unit_Cell
-        else:
-            Metadata['V0'] = Custom_Value
-            Metadata['V0 Uncertainty'] = Custom_Uncertainty
-    elif Reference_Type == 'lambda_0':
-        Metadata['V0'] = Custom_Value
-        Metadata['V0 Uncertainty'] = Custom_Uncertainty
-    else:
-        Metadata['V0'] = Custom_Value
-        Metadata['V0 Uncertainty'] = Custom_Uncertainty
-
-    return Metadata
+    # Here every custom reference that is not a volume is stored in the V0 slot, and that includes a reference pressure (P0).
+    # That is not how the functions are rebuilt (Apply_The_Custom_Reference stores a reference pressure as the reference pressure),
+    # so with a custom P0 the parameter uncertainties are found with the reference pressure's value as V0. The app only offers
+    # V0, lambda_0 and nu_0, so this can only happen when the functions are called directly. It is kept as it was.
+    return Apply_The_Custom_Reference(Metadata, 'V0' if Reference_Type == 'V0' else 'nu_0', Custom_Value, Custom_Uncertainty)
 
 
 # Find the reference pressure used as the lower bound for inverse calculations
@@ -157,18 +141,12 @@ def _Get_Reference_Pressure(Metadata):
 
 # Rebuild a forward or inverse closure with a perturbed single parameter
 def _Rebuild_Forward(Registry_Entry, Metadata, Equation_Type, Composition, Label='perturbed'):
-    if Equation_Type in Equation_Required_Extra_Prep_Work:
-        Forward_Function, _ = _Build_AP2_Closure_Pair(Registry_Entry, Metadata, Composition, Label)
-        return Forward_Function
-    return _Build_Generic_Closure(Registry_Entry, 'forward', Metadata, Label)
+    return Build_The_Functions_For_An_Equation(Registry_Entry, Metadata, Equation_Type, Composition, Label, Directions=('forward',))[0]
 
 
 # Rebuild an inverse closure with a perturbed single parameter
 def _Rebuild_Inverse(Registry_Entry, Metadata, Equation_Type, Composition, Label='perturbed'):
-    if Equation_Type in Equation_Required_Extra_Prep_Work:
-        _, Inverse_Function = _Build_AP2_Closure_Pair(Registry_Entry, Metadata, Composition, Label)
-        return Inverse_Function
-    return _Build_Generic_Closure(Registry_Entry, 'inverse', Metadata, Label)
+    return Build_The_Functions_For_An_Equation(Registry_Entry, Metadata, Equation_Type, Composition, Label, Directions=('inverse',))[1]
 
 
 

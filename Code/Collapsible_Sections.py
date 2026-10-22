@@ -4,7 +4,7 @@ import html as html_lib
     # Load third party libraries
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QStyledItemDelegate, QStyleOptionViewItem, QStyleOptionComboBox, QApplication, QStyle, QCheckBox, QGraphicsDropShadowEffect, QPushButton, QSizePolicy
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, Property, QRect, Signal, QSize
-from PySide6.QtGui import QPainter, QColor, QTextDocument
+from PySide6.QtGui import QPainter, QColor, QTextDocument, QPalette
     # Load local functions from local files
 from Themes.Theme import DEFAULT_MINIMUM_CONTENT_WIDTH, Get_Theme
 
@@ -49,6 +49,9 @@ class WordWrapDelegate(QStyledItemDelegate):
         # Storing the combo box lets sizeHint use its current pixel width,
         # which equals the popup width and is available before the popup opens.
         self.Combo_Box = combo_box
+        # A list that wraps long labels should be as wide as its box (see Dropdown.Set_Wide_List)
+        if combo_box is not None and hasattr(combo_box, "Set_Wide_List"):
+            combo_box.Set_Wide_List(True)
         # QListView defaults to uniform item sizes for performance, which queries
         # sizeHint() for only a sample row and reuses that height for every row.
         # Rows that need an extra caution line would then get clipped to whatever
@@ -69,6 +72,10 @@ class WordWrapDelegate(QStyledItemDelegate):
         # tall only one was visible at a time). It's kept only as a later fallback.
         if self.Combo_Box is not None and self.Combo_Box.width() > 0:
             available_width = self.Combo_Box.width()
+            # The list can be narrower than the box (a style sheet can cap its width), and the rows wrap at the width the list has
+            View_Maximum_Width = self.parent().maximumWidth() if self.parent() is not None else 16777215
+            if View_Maximum_Width < 100000:
+                available_width = min(available_width, View_Maximum_Width)
         else:
             view = self.parent()
             vp = view.viewport() if view is not None else None
@@ -220,6 +227,9 @@ class Dropdown(QComboBox):
         self.Arrow_Animation.setDuration(ANIMATION_DURATION)
         self.Arrow_Animation.setEasingCurve(QEasingCurve.InOutCubic)
         self.Position_Arrow()
+        # Whether the selected text is shown on as many lines as it needs instead of one line that is cut off (see Set_Wrap_Selected_Text)
+        self.Wrap_Selected_Text = False
+        self.currentTextChanged.connect(lambda _=None: self.updateGeometry())
         # Apply the widget shadow directly so it works even inside collapsible
         # sections whose own QGraphicsDropShadowEffect would otherwise prevent
         # child effects from rendering outside their bounding rect
@@ -233,6 +243,94 @@ class Dropdown(QComboBox):
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self.Position_Arrow()
+        # The wrapped text needs a different number of lines at a different width, so the height it needs may have changed
+        if self.Wrap_Selected_Text:
+            self.updateGeometry()
+
+
+    # Show the whole selected text, wrapped onto as many lines as it needs, instead of one line that is cut off
+    # (a combo box can only draw its text on one line, so with this on the text is drawn in paintEvent and the box is as tall as the text needs).
+    # The list that opens already wraps its items (WordWrapDelegate); this makes the closed box match it
+    # The numbers below come from the QComboBox#Dropdown rule in Dropdowns.qss: a 1 px border and 4 px of padding above and below, 8 px of padding
+    # on the left, and the 28 px arrow on the right
+    Selected_Text_Left = 9
+    Selected_Text_Top = 5
+    Selected_Text_Gap_To_Arrow = 6
+    Arrow_Width = 28
+
+    def Set_Wrap_Selected_Text(self, Wrap=True):
+        self.Wrap_Selected_Text = Wrap
+        # The long labels that wrap in the box wrap in the list too, and the list should be as wide as the box
+        if Wrap:
+            self.Set_Wide_List(True)
+        self.updateGeometry()
+        self.update()
+
+
+    # Give the list that opens the full width of the box. Dropdowns.qss otherwise caps the list at 600 px, which is narrower than a wide box,
+    # so long labels that wrap would use less than the width there is (and a delegate that measures rows against the box would be wrong)
+    def Set_Wide_List(self, Wide=True):
+        self.setProperty("Wide_List", "true" if Wide else "false")
+        # The list that opens was already styled when it was made, so style it again with the property (and the box itself)
+        for Styled_Widget in (self, self.view(), self.view().window()):
+            Styled_Widget.style().unpolish(Styled_Widget)
+            Styled_Widget.style().polish(Styled_Widget)
+
+
+    # The width the selected text has to fit in
+    def Get_Selected_Text_Width(self, Box_Width=None):
+        Box_Width = Box_Width if Box_Width is not None else (self.width() or self.Minimum_Wrapped_Width)
+        return max(1, Box_Width - self.Selected_Text_Left - self.Arrow_Width - self.Selected_Text_Gap_To_Arrow)
+
+    Minimum_Wrapped_Width = 200
+
+
+    # The selected text as a document wrapped to the width it has. The leading "*" of a user edited or entered study is colored
+    def Build_Wrapped_Text_Document(self, Box_Width=None):
+        Document = QTextDocument()
+        Document.setDefaultFont(self.font())
+        Document.setTextWidth(self.Get_Selected_Text_Width(Box_Width))
+        Group = QPalette.Active if self.isEnabled() else QPalette.Disabled
+        Normal_Color = self.palette().color(Group, self.foregroundRole()).name()
+        Current_Text = self.currentText()
+        if Current_Text.startswith("* "):
+            _, _, Theme_Colors = Get_Theme()
+            Star_Color = QColor(Theme_Colors.get("Secondary_Caution_Text")).name()
+            Html = f'<span style="color:{Star_Color}">*</span><span style="color:{Normal_Color}">{html_lib.escape(Current_Text[1:])}</span>'
+        else:
+            Html = f'<span style="color:{Normal_Color}">{html_lib.escape(Current_Text)}</span>'
+        Document.setHtml(Html)
+        return Document
+
+
+    # The height of the selected text when it is wrapped to the width it has
+    def Get_Wrapped_Text_Height(self, Box_Width=None):
+        return int(self.Build_Wrapped_Text_Document(Box_Width).size().height())
+
+
+    # The height the box needs at a width, so a layout can give it the right height before it has been resized to that width
+    def hasHeightForWidth(self):
+        return self.Wrap_Selected_Text and bool(self.currentText())
+
+
+    def heightForWidth(self, Box_Width):
+        Base_Height = super().sizeHint().height()
+        return max(Base_Height, self.Get_Wrapped_Text_Height(Box_Width) + 2 * self.Selected_Text_Top)
+
+
+    # The box is as tall as its wrapped text needs, and never shorter than it would be with one line
+    def sizeHint(self):
+        Size = super().sizeHint()
+        if self.Wrap_Selected_Text and self.currentText():
+            Size.setHeight(max(Size.height(), self.Get_Wrapped_Text_Height() + 2 * self.Selected_Text_Top))
+        return Size
+
+
+    def minimumSizeHint(self):
+        Size = super().minimumSizeHint()
+        if self.Wrap_Selected_Text and self.currentText():
+            Size.setHeight(max(Size.height(), self.Get_Wrapped_Text_Height() + 2 * self.Selected_Text_Top))
+        return Size
 
     def Update_Shadow(self):
         # Detect light/dark from the actual applied palette rather than QSettings
@@ -301,9 +399,10 @@ class Dropdown(QComboBox):
     def paintEvent(self, event):
         # Calibration dropdowns prefix user-edited/entered option text with "* ".
         # Color just that leading "*" in the closed box; everything else paints
-        # exactly as the default QComboBox would.
+        # exactly as the default QComboBox would, unless the text is wrapped (Set_Wrap_Selected_Text).
         Current_Text = self.currentText()
-        if not Current_Text.startswith("* "):
+        Wrap = self.Wrap_Selected_Text and bool(Current_Text)
+        if not Current_Text.startswith("* ") and not Wrap:
             super().paintEvent(event)
             return
 
@@ -317,6 +416,14 @@ class Dropdown(QComboBox):
         # without it the style falls back to native chrome (square corners, double arrow).
         opt.currentText = ""
         Style.drawComplexControl(QStyle.ComplexControl.CC_ComboBox, opt, painter, self)
+
+        # Wrapped: the whole text on as many lines as it needs, centered in the box
+        if Wrap:
+            Document = self.Build_Wrapped_Text_Document()
+            Top = self.Selected_Text_Top + max(0, (self.height() - 2 * self.Selected_Text_Top - Document.size().height()) / 2)
+            painter.translate(self.Selected_Text_Left, Top)
+            Document.drawContents(painter)
+            return
 
         Text_Rect = Style.subControlRect(QStyle.ComplexControl.CC_ComboBox, opt, QStyle.SubControl.SC_ComboBoxEditField, self)
         Text_Rect = Text_Rect.adjusted(2, 0, -2, 0)

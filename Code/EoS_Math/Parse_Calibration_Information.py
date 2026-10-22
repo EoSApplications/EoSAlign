@@ -10,6 +10,8 @@ except ImportError:
     from Reference_Values_And_Units import *
 from .Volume_Conversion_Functions import *
 from .Create_List_Of_Functions_And_Variables import *
+from .Build_Equation_Functions import Build_The_Functions_For_An_Equation
+from .Custom_Reference import Check_The_Custom_Reference, Apply_The_Custom_Reference
 
 
 
@@ -195,75 +197,6 @@ def Parse_Calibration_Entry_Values_Into_Calibration_Information(Calibration_Entr
 
 
 
-# Convert V0 (and optionally V0_unc) to the correct units for the corresponding equation.
-    # This is only necessary for XRD equations.
-        # Adaptive Polynomial (AP2) needs V0 to be in A^3/atom.
-        # All other XRD equations need V0 to be in A^3/unit cell.
-    # V0_unc is always in the same units as the V0 field it came from, so it receives
-    # the identical conversion. Returns a (V0, V0_unc) tuple; V0_unc is None when not provided.
-def Convert_V0_To_The_Correct_Units_For_The_Corresponding_Equation(Calibration_Information, Composition, Equation, V0_Unc=None):
-
-    # Convert the uncertainty with the same function used for V0 (or return it unchanged when no conversion is needed)
-    def _Convert_Unc(Converter=None, *Args):
-        if V0_Unc is None:
-            return None
-        try:
-            Unc = float(V0_Unc)
-        except (TypeError, ValueError):
-            return None
-        if Unc <= 0:
-            return None
-        return Converter(Unc, *Args) if Converter is not None else Unc
-
-    # Get the method from the calibration information
-    Method = Calibration_Information.get('Method', '')
-
-    # Check if the method is XRD
-    if Method == 'XRD':
-
-        # AP2/H12-like equations require V0 in A^3/atom
-        if Equation in Equation_Required_Extra_Prep_Work:
-            # Check if the volume is already in Angstroms cubed per atom
-            if Calibration_Information.get('V0 per Atom') is not None:
-                return float(Calibration_Information['V0 per Atom']), _Convert_Unc()
-            # Check if the volume is in Angstroms cubed per unit cell
-            if Calibration_Information.get('V0') is not None:
-                return (Convert_Angstroms_Cubed_Per_Unit_Cell__To__Angstroms_Cubed_Per_Atom(Calibration_Information['V0'], Composition),
-                        _Convert_Unc(Convert_Angstroms_Cubed_Per_Unit_Cell__To__Angstroms_Cubed_Per_Atom, Composition))
-            # Check if the volume is in Angstroms cubed per formula unit
-            if Calibration_Information.get('V0 per Formula Unit') is not None:
-                return (Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Atom(Calibration_Information['V0 per Formula Unit'], Composition),
-                        _Convert_Unc(Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Atom, Composition))
-            # Check if the volume is in centimeters cubed per mole
-            if Calibration_Information.get('V0 per Centimeter Cubed per Mole') is not None:
-                return (Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Atom(Calibration_Information['V0 per Centimeter Cubed per Mole'], Composition),
-                        _Convert_Unc(Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Atom, Composition))
-            raise ValueError(f"AP2/H12 requires V0 in any form (A^3/unit cell, A^3/atom, A^3/formula unit, or cm^3/mol) for composition '{Composition}'")
-
-        # All other XRD equations require V0 in A^3/unit cell
-            # Check if the volume is already in Angstroms cubed per unit cell
-        if Calibration_Information.get('V0') is not None:
-            return float(Calibration_Information['V0']), _Convert_Unc()
-            # Check if the volume is in Angstroms cubed per formula unit
-        if Calibration_Information.get('V0 per Formula Unit') is not None:
-            return (Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Unit_Cell(Calibration_Information['V0 per Formula Unit'], Composition),
-                    _Convert_Unc(Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Unit_Cell, Composition))
-            # Check if the volume is in Angstroms cubed per atom
-        if Calibration_Information.get('V0 per Atom') is not None:
-            return (Convert_Angstroms_Cubed_Per_Atom__To__Angstroms_Cubed_Per_Unit_Cell(Calibration_Information['V0 per Atom'], Composition),
-                    _Convert_Unc(Convert_Angstroms_Cubed_Per_Atom__To__Angstroms_Cubed_Per_Unit_Cell, Composition))
-            # Check if the volume is in centimeters cubed per mole
-        if Calibration_Information.get('V0 per Centimeter Cubed per Mole') is not None:
-            return (Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Unit_Cell(Calibration_Information['V0 per Centimeter Cubed per Mole'], Composition),
-                    _Convert_Unc(Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Unit_Cell, Composition))
-        # If no volume information was found for this XRD calibration send an error message
-        raise ValueError(f"XRD calibration for '{Composition}' has no volume field")
-
-    # For all other methods return V0 and V0_unc unchanged
-    return Calibration_Information.get('V0'), _Convert_Unc()
-
-
-
 # Find the corresponding atomic number for a composition as is required for Adaptive Polynomial (AP2) functions
 def Find_The_Corresponding_Atomic_Number_For_A_Composition(Calibration_Information, Composition, Equation_Type, File_Key):
 
@@ -279,194 +212,6 @@ def Find_The_Corresponding_Atomic_Number_For_A_Composition(Calibration_Informati
 
     # Return the atomic number
     return Atomic_Number
-
-
-
-# Store the corresponding forward or inverse function and variables for an equation
-def Store_The_Forward_Or_Inverse_Function_For_An_Equation(Equation_Entry_From_List_Of_Functions_And_Variables, Equation_Direction, Equation_Variables, Equation_Label):
-
-    def _entry_get(*keys, default=None):
-        for Key in keys:
-            if Key in Equation_Entry_From_List_Of_Functions_And_Variables:
-                return Equation_Entry_From_List_Of_Functions_And_Variables[Key]
-        return default
-
-    # Find the forward or inverse function for this equation
-    Function = _entry_get(
-        f'{Equation_Direction}_Function',
-        f'{Equation_Direction.capitalize()}_Function',
-    )
-    # Check if the function exists
-    if Function is None:
-        # If the function does not exist return None
-        return None
-    # Get the variable order for the function
-    Variable_Order_For_The_Function = _entry_get(
-        f'{Equation_Direction}_Variable_Order_For_The_Function',
-        f'{Equation_Direction}_Variable_Order_For_The_Functions',
-        f'{Equation_Direction.capitalize()}_Variable_Order_For_The_Function',
-        f'{Equation_Direction.capitalize()}_Variable_Order_For_The_Functions',
-        default=[],
-    )
-    # Get the required variables for the function
-    Required_Variables_For_The_Function = _entry_get(
-        f'{Equation_Direction}_Required_Variables_For_The_Function',
-        f'{Equation_Direction}_Required_Variables_For_The_Functions',
-        f'{Equation_Direction.capitalize()}_Required_Variables_For_The_Function',
-        f'{Equation_Direction.capitalize()}_Required_Variables_For_The_Functions',
-        default=[],
-    )
-
-    # Make a place to store any missing variables
-    Missing_Variables = []
-    # Check if any of the required variables are missing from the equation variables
-    for Required_Variable in Required_Variables_For_The_Function:
-        # Find the value for the required variable
-        Value = Equation_Variables.get(Calibration_Key_To_Entry_Key.get(Required_Variable, Required_Variable))
-        # If the value does not exist
-        if Value is None:
-            # Add the required variable to the list of missing variables
-            Missing_Variables.append(Required_Variable)
-    # If any variables are missing
-    if Missing_Variables:
-        # Send an error message
-        raise ValueError(f"The {Equation_Direction} {Equation_Label} function is missing the following required variables: {Missing_Variables}")
-
-    # Store all the required variables in the correct order for the function
-    Ordered_Required_Variables = []
-    # Go through all the variables in order
-    for (Variable_Type, Variable_Entry_Or_Value) in Variable_Order_For_The_Function:
-        # Check if this variable comes from the calibration files
-        if Variable_Type == 'calibration':
-            # Find the corresponding calibration file entry label for this variable
-            Calibration_File_Variable_Information_Entry_Label = Calibration_Key_To_Entry_Key.get(Variable_Entry_Or_Value, Variable_Entry_Or_Value)
-            # Get the value stored in the calibration file entry for this variable
-            Value = Equation_Variables.get(Calibration_File_Variable_Information_Entry_Label)
-            # Check if the value exists
-            if Value is not None:
-                # Add the value to the list of ordered required variables
-                Ordered_Required_Variables.append(float(Value))
-        # Check if this variable is a constant
-        elif Variable_Type == 'Constant':
-            # Add the constant value to the list of ordered required variables
-            Ordered_Required_Variables.append(Variable_Entry_Or_Value)
-
-    # Store the corresponding forward or inverse function and variables for this equation
-    return lambda Input_Values, Function_For_The_Equation=Function, Ordered_Required_Variables=Ordered_Required_Variables: Function_For_The_Equation(Input_Values, *Ordered_Required_Variables)
-
-
-
-# Store the forward and inverse functions and variables for the Adaptive Polynomial (AP2) equation
-    # Volume is inputted as Angstroms cubed per unit cell
-    # The volume for the forward function must be in Angstroms cubed per atom
-    # The volume for the inverse function will output Angstroms cubed per atom
-    # Then convert to Angstroms cubed per unit cell
-def Store_The_Forward_Or_Inverse_Function_For_The_Adaptive_Polynomial_Equation(Equation_Entry_From_List_Of_Functions_And_Variables, Equation_Variables, Composition, Equation_Label):
-
-    def _entry_get(*keys, default=None):
-        for Key in keys:
-            if Key in Equation_Entry_From_List_Of_Functions_And_Variables:
-                return Equation_Entry_From_List_Of_Functions_And_Variables[Key]
-        return default
-
-    # Find the forward and inverse Adaptive Polynomial (AP2) functions
-    Forward_Function = _entry_get('Forward_Function', 'forward_Function')
-    Inverse_Function = _entry_get('Inverse_Function', 'inverse_Function')
-    # Check that both the forward and inverse Adaptive Polynomial (AP2) functions exist
-    if Forward_Function is None or Inverse_Function is None:
-        # If either function is missing send an error message
-        raise ValueError(
-            "Either the AP2 forward or reverse functions are missing. Check that both functions are un-commented in XRD_Functions.py and run Update_List_Of_Functions_And_Variables().")
-    # Validate required params for both Equation_Directions
-    for Equation_Direction, Required_Variables_For_The_Function in [
-        (
-            'forward',
-            _entry_get(
-                'forward_required_params',
-                'forward_Required_Variables_For_The_Functions',
-                'Forward_Required_Variables_For_The_Functions',
-                default=[],
-            ),
-        ),
-        (
-            'inverse',
-            _entry_get(
-                'inverse_required_params',
-                'inverse_Required_Variables_For_The_Functions',
-                'Inverse_Required_Variables_For_The_Functions',
-                default=[],
-            ),
-        ),
-    ]:
-        # Add any missing required variables to a list of missing variables
-        Missing_Variables = [Required_Variable for Required_Variable in Required_Variables_For_The_Function if Equation_Variables.get(Calibration_Key_To_Entry_Key.get(Required_Variable, Required_Variable)) is None]
-        # If there are any missing required variables
-        if Missing_Variables:
-            # Send an error message with the missing variables
-            raise ValueError(f"AP2 {Equation_Direction}: missing required params for '{Equation_Label}': {Missing_Variables}")
-    # Store the required variables in order for a function direction
-    def Build_Ordered_Required_Variables(Variable_Order_For_The_Function):
-        Ordered_Required_Variables = []
-        for (Variable_Type, Variable_Entry_Or_Value) in Variable_Order_For_The_Function:
-            # Check if this variable comes from the calibration files
-            if Variable_Type == 'calibration':
-                # Translate calibration key to display key before looking up in Equation_Variables
-                Calibration_File_Variable_Information_Entry_Label = Calibration_Key_To_Entry_Key.get(Variable_Entry_Or_Value, Variable_Entry_Or_Value)
-                # Get the value stored in the calibration file entry for this variable
-                Value = Equation_Variables.get(Calibration_File_Variable_Information_Entry_Label)
-                # Check if the value exists
-                if Value is not None:
-                    # Add the value to the list of ordered required variables
-                    Ordered_Required_Variables.append(float(Value))
-            # Check if this variable is a constant
-            else:
-                # Add the constant value to the list of ordered required variables
-                Ordered_Required_Variables.append(Variable_Entry_Or_Value)
-        # Return the ordered required variables for this function direction
-        return Ordered_Required_Variables
-    # Get the variable order for the forward and inverse functions
-    Forward_Variable_Order_For_The_Function = _entry_get(
-        'Forward_Variable_Order_For_The_Functions',
-        'forward_Variable_Order_For_The_Functions',
-        'forward_Variable_Order_For_The_Function',
-        default=[],
-    )
-    Ordered_Required_Variables_For_Forward = Build_Ordered_Required_Variables(Forward_Variable_Order_For_The_Function)
-    Inverse_Variable_Order_For_The_Function = _entry_get(
-        'Inverse_Variable_Order_For_The_Functions',
-        'inverse_Variable_Order_For_The_Functions',
-        'inverse_Variable_Order_For_The_Function',
-        default=[],
-    )
-    Ordered_Required_Variables_For_Inverse = Build_Ordered_Required_Variables(Inverse_Variable_Order_For_The_Function)
-
-    # Forward Function: volume arrives in A^3/unit cell, AP2 expects A^3/atom
-    def AP2_Forward(Input_Values, Function_For_The_Equation=Forward_Function, Ordered_Required_Variables=Ordered_Required_Variables_For_Forward):
-        Input_Values_Per_Atom = Convert_Angstroms_Cubed_Per_Unit_Cell__To__Angstroms_Cubed_Per_Atom(Input_Values, Composition)
-        return Function_For_The_Equation(Input_Values_Per_Atom, *Ordered_Required_Variables)
-    # Inverse Function: AP2 returns A^3/atom, convert back to A^3/unit cell
-    def AP2_Inverse(Input_Values, Function_For_The_Equation=Inverse_Function, Ordered_Required_Variables=Ordered_Required_Variables_For_Inverse):
-        Output_Values_Per_Atom = Function_For_The_Equation(Input_Values, *Ordered_Required_Variables)
-        # Check if there is an output value
-        if Output_Values_Per_Atom is not None:
-            Output_Values_Per_Unit_Cell = Convert_Angstroms_Cubed_Per_Atom__To__Angstroms_Cubed_Per_Unit_Cell(Output_Values_Per_Atom, Composition) if Output_Values_Per_Atom is not None else None
-            # Return the converted output value
-            return Output_Values_Per_Unit_Cell
-        # If there is no output value
-        else:
-            # Return None
-            return None
-
-    # Return the forward and inverse functions for the Adaptive Polynomial (AP2) equation
-    return AP2_Forward, AP2_Inverse
-
-
-
-# Store the provided parameter values in their corresponding functions
-def Store_Provided_Variables_For_An_Equation(Equation_Entry_From_The_List_Of_Functions, Direction, Metadata, Label):
-    return Store_The_Forward_Or_Inverse_Function_For_An_Equation(Equation_Entry_From_The_List_Of_Functions, Direction, Metadata, Label)
-def Store_Provided_Variables_For_The_Forward_And_Inverse_Adaptive_Polynomial_Equations(Equation_Entry_From_The_List_Of_Functions, Metadata, Composition, Label):
-    return Store_The_Forward_Or_Inverse_Function_For_The_Adaptive_Polynomial_Equation(Equation_Entry_From_The_List_Of_Functions, Metadata, Composition, Label)
 
 
 
@@ -540,12 +285,7 @@ def Build_One_Calibration(Calibration_Entry, File_Key, Is_User_Edited=False, Is_
     if Calibration_File_Value_For_Equation == 'LinearShift' and Calibration_Information.get('Reference Wavelength (nm)') is None:
         Calibration_Information['Reference Wavelength (nm)'] = Calibration_Information.get('V0')
     # Build the forward and inverse functions for this equation
-        # The Adaptive Polynomial is a special case
-    if Calibration_File_Value_For_Equation in Equation_Required_Extra_Prep_Work:
-        Forward_Function, Inverse_Function = Store_The_Forward_Or_Inverse_Function_For_The_Adaptive_Polynomial_Equation(Equation_From_List_Of_Functions_And_Variables, Calibration_Information, Composition, File_Key)
-    else:
-        Forward_Function = Store_The_Forward_Or_Inverse_Function_For_An_Equation(Equation_From_List_Of_Functions_And_Variables, 'forward', Calibration_Information, File_Key)
-        Inverse_Function = Store_The_Forward_Or_Inverse_Function_For_An_Equation(Equation_From_List_Of_Functions_And_Variables, 'inverse', Calibration_Information, File_Key)
+    Forward_Function, Inverse_Function = Build_The_Functions_For_An_Equation(Equation_From_List_Of_Functions_And_Variables, Calibration_Information, Calibration_File_Value_For_Equation, Composition, File_Key)
 
     # Return the calibration file key, the calibration information, the formward function, and the inverse function for this calibration
     return File_Key, Calibration_Information, Forward_Function, Inverse_Function
@@ -559,64 +299,16 @@ def Rebuild_One_Calibration_To_Use_A_User_Inputted_Reference_Value(File_Key, Cus
     if File_Key not in Calibration_Information:
         # If the calibration does not exist send an error message
         raise ValueError(f"Calibration '{File_Key}' not found")
-    # Check if the custom reference input is a dictionary
-    if not isinstance(Custom_Reference, dict):
-        # If the custom reference input is not a dictionary send an error message
-        raise ValueError("Custom reference must be a dictionary with keys 'type' and 'value'")
-    # Get the custom reference value
-    Custom_Reference_Value = Custom_Reference.get('value')
-    # Check if the custom reference value exists
-    if Custom_Reference_Value is None:
-        # If the custom reference value does not exist send an error message
-        raise ValueError("Custom reference must have a 'value'")
+    # Check that the custom reference can be used
+    Reference_Type = Check_The_Custom_Reference(Custom_Reference)
     # Create a seperate copy of the calibration information so the original calibration information is not modified
     Calibration_Information = dict(Calibration_Information[File_Key])
     # Get the equation of state for the calibration
     Equation_Of_State = Calibration_Information.get('Equation of State', '')
     # Get the composition for the calibration
     Composition = (Calibration_Information.get('Composition') or '').strip()
-    # Get the reference type for the custom reference
-    Reference_Type = Custom_Reference.get('type')
-    # Check if the custom reference type exists
-    if Reference_Type is None:
-        # If the custom reference type does not exist send an error message
-        raise ValueError("Custom reference must have a 'type'")
-    # Convert the custom reference type to a clean string
-    Reference_Type = str(Reference_Type).strip()
-    # Check if the custom reference type is empty
-    if Reference_Type == '':
-        # If the custom reference type is empty send an error message
-        raise ValueError("Custom reference 'type' is empty. Expected one of: V0, lambda_0, nu_0, P0")
-    # Check if the custom reference type is a supported selected option
-    Supported_Reference_Types = ['V0', 'lambda_0', 'nu_0', 'P0']
-    if Reference_Type not in Supported_Reference_Types:
-        # If the custom reference type is not one of the supported options send an error message
-        raise ValueError(f"Unsupported custom reference type '{Reference_Type}'. Expected one of: {', '.join(Supported_Reference_Types)}")
-    # Check if the user provided a reference volume
-    if Reference_Type == 'V0':
-        # Make sure the the custon reference volume is the only reference value provided for this calibration
-            # Note: this is only changing the copy of the calibration information not the original calibration information
-        Calibration_Information['V0'] = Custom_Reference_Value
-        Calibration_Information['V0 per Atom'] = None
-        Calibration_Information['V0 per Formula Unit'] = None
-        Calibration_Information['V0 per Centimeter Cubed per Mole'] = None
-        # Make sure the provided reference volume is in the correct units for the corresponding equation
-        # V0_unc is already in correct units from Build_One_Calibration and must not be re-converted
-        V0, _ = Convert_V0_To_The_Correct_Units_For_The_Corresponding_Equation(Calibration_Information, Composition, Equation_Of_State)
-        Calibration_Information['V0'] = V0
-    # Check if the user provided a reference wavelength
-    elif Reference_Type == 'lambda_0':
-        # For Luminescence closures this is stored in the V0 slot
-        Calibration_Information['V0'] = Custom_Reference_Value
-    # Check if the user provided a reference frequency/wavenumber
-    elif Reference_Type == 'nu_0':
-        # For Raman/luminescence closures this is stored in the V0 slot
-        Calibration_Information['V0'] = Custom_Reference_Value
-    # Check if the user provided a reference pressure
-    elif Reference_Type == 'P0':
-        # Store both user-facing and calibration-key style versions for compatibility
-        Calibration_Information['Reference Pressure'] = Custom_Reference_Value
-        Calibration_Information['P0'] = Custom_Reference_Value
+    # Store the custom reference in the copy of the calibration information (the original is not changed)
+    Apply_The_Custom_Reference(Calibration_Information, Reference_Type, Custom_Reference.get('value'))
     # Check if the list of functions and variables is provided
     if List_Of_Functions_And_Variables is None:
         # Load the list of functions and variables
@@ -631,12 +323,7 @@ def Rebuild_One_Calibration_To_Use_A_User_Inputted_Reference_Value(File_Key, Cus
         raise ValueError(f"Registry key '{List_Of_Functions_And_Variables_Entry}' not found - run Update_List_Of_Functions_And_Variables() to rebuild the registry.")
 
     # Update the stored forward and inverse functions for this calibration with the new reference value
-        # The Adaptive Polynomial is a special case
-    if Equation_Of_State in Equation_Required_Extra_Prep_Work:
-        Forward_Function, Inverse_Function = Store_The_Forward_Or_Inverse_Function_For_The_Adaptive_Polynomial_Equation(Equation_From_List_Of_Functions_And_Variables, Calibration_Information, Composition, File_Key)
-    else:
-        Forward_Function = Store_The_Forward_Or_Inverse_Function_For_An_Equation(Equation_From_List_Of_Functions_And_Variables, 'forward', Calibration_Information, File_Key)
-        Inverse_Function = Store_The_Forward_Or_Inverse_Function_For_An_Equation(Equation_From_List_Of_Functions_And_Variables, 'inverse', Calibration_Information, File_Key)
+    Forward_Function, Inverse_Function = Build_The_Functions_For_An_Equation(Equation_From_List_Of_Functions_And_Variables, Calibration_Information, Equation_Of_State, Composition, File_Key)
 
     # Return the forward and inverse functions for this calibration with the user inputted reference value
     return Forward_Function, Inverse_Function

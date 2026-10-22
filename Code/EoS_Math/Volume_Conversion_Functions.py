@@ -134,3 +134,97 @@ def Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Atom(V0_Per_Cm3_
 
 
 
+# Check whether a volume unit is already A^3/unit cell
+def Check_If_The_Volume_Is_In_Angstroms_Cubed_Per_Unit_Cell(Volume_Unit):
+
+    # Check if the volume unit is Angstroms cubed per unit cell
+    return Volume_Unit == Volume_Units[0]
+
+
+
+# Convert a list of volumes to A^3/unit cell using direct conversion helpers
+def Convert_All_Volumes_To_Angstroms_Cubed_Per_Unit_Cell(Volume_Values, Volume_Unit, Composition):
+    
+    # Check if the volume is Angstroms cubed per unit cell
+    if Volume_Unit == Volume_Units[0]:
+        return [float(Value) for Value in Volume_Values]
+    if Volume_Unit == Volume_Units[1]:
+        Converter = Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Unit_Cell
+    elif Volume_Unit == Volume_Units[2]:
+        Converter = Convert_Angstroms_Cubed_Per_Atom__To__Angstroms_Cubed_Per_Unit_Cell
+    elif Volume_Unit == Volume_Units[3]:
+        Converter = Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Unit_Cell
+    else:
+        raise ValueError(f"Unknown volume unit '{Volume_Unit}'. Expected one of: {Volume_Units}")
+
+    # Return the converted volumes in Angstroms cubed per unit cell
+    return [Converter(Value, Composition) for Value in Volume_Values]
+
+
+
+# Convert V0 (and optionally V0_unc) to the correct units for the corresponding equation.
+    # This is only necessary for XRD equations.
+        # Adaptive Polynomial (AP2) needs V0 to be in A^3/atom.
+        # All other XRD equations need V0 to be in A^3/unit cell.
+    # V0_unc is always in the same units as the V0 field it came from, so it receives
+    # the identical conversion. Returns a (V0, V0_unc) tuple; V0_unc is None when not provided.
+def Convert_V0_To_The_Correct_Units_For_The_Corresponding_Equation(Calibration_Information, Composition, Equation, V0_Unc=None):
+
+    # Convert the uncertainty with the same function used for V0 (or return it unchanged when no conversion is needed)
+    def _Convert_Unc(Converter=None, *Args):
+        if V0_Unc is None:
+            return None
+        try:
+            Unc = float(V0_Unc)
+        except (TypeError, ValueError):
+            return None
+        if Unc <= 0:
+            return None
+        return Converter(Unc, *Args) if Converter is not None else Unc
+
+    # Get the method from the calibration information
+    Method = Calibration_Information.get('Method', '')
+
+    # Check if the method is XRD
+    if Method == 'XRD':
+
+        # AP2/H12-like equations require V0 in A^3/atom
+        if Equation in Equation_Required_Extra_Prep_Work:
+            # Check if the volume is already in Angstroms cubed per atom
+            if Calibration_Information.get('V0 per Atom') is not None:
+                return float(Calibration_Information['V0 per Atom']), _Convert_Unc()
+            # Check if the volume is in Angstroms cubed per unit cell
+            if Calibration_Information.get('V0') is not None:
+                return (Convert_Angstroms_Cubed_Per_Unit_Cell__To__Angstroms_Cubed_Per_Atom(Calibration_Information['V0'], Composition),
+                        _Convert_Unc(Convert_Angstroms_Cubed_Per_Unit_Cell__To__Angstroms_Cubed_Per_Atom, Composition))
+            # Check if the volume is in Angstroms cubed per formula unit
+            if Calibration_Information.get('V0 per Formula Unit') is not None:
+                return (Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Atom(Calibration_Information['V0 per Formula Unit'], Composition),
+                        _Convert_Unc(Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Atom, Composition))
+            # Check if the volume is in centimeters cubed per mole
+            if Calibration_Information.get('V0 per Centimeter Cubed per Mole') is not None:
+                return (Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Atom(Calibration_Information['V0 per Centimeter Cubed per Mole'], Composition),
+                        _Convert_Unc(Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Atom, Composition))
+            raise ValueError(f"AP2/H12 requires V0 in any form (A^3/unit cell, A^3/atom, A^3/formula unit, or cm^3/mol) for composition '{Composition}'")
+
+        # All other XRD equations require V0 in A^3/unit cell
+            # Check if the volume is already in Angstroms cubed per unit cell
+        if Calibration_Information.get('V0') is not None:
+            return float(Calibration_Information['V0']), _Convert_Unc()
+            # Check if the volume is in Angstroms cubed per formula unit
+        if Calibration_Information.get('V0 per Formula Unit') is not None:
+            return (Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Unit_Cell(Calibration_Information['V0 per Formula Unit'], Composition),
+                    _Convert_Unc(Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Unit_Cell, Composition))
+            # Check if the volume is in Angstroms cubed per atom
+        if Calibration_Information.get('V0 per Atom') is not None:
+            return (Convert_Angstroms_Cubed_Per_Atom__To__Angstroms_Cubed_Per_Unit_Cell(Calibration_Information['V0 per Atom'], Composition),
+                    _Convert_Unc(Convert_Angstroms_Cubed_Per_Atom__To__Angstroms_Cubed_Per_Unit_Cell, Composition))
+            # Check if the volume is in centimeters cubed per mole
+        if Calibration_Information.get('V0 per Centimeter Cubed per Mole') is not None:
+            return (Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Unit_Cell(Calibration_Information['V0 per Centimeter Cubed per Mole'], Composition),
+                    _Convert_Unc(Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Unit_Cell, Composition))
+        # If no volume information was found for this XRD calibration send an error message
+        raise ValueError(f"XRD calibration for '{Composition}' has no volume field")
+
+    # For all other methods return V0 and V0_unc unchanged
+    return Calibration_Information.get('V0'), _Convert_Unc()

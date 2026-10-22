@@ -60,6 +60,11 @@ QComboBox#Dropdown QAbstractItemView {
     outline: none;
     max-width: 600px;
 }
+/* A dropdown whose list wraps long labels (it has a WordWrapDelegate, see Dropdown.Set_Wide_List) has a list as wide as the box,
+   so the labels can use the whole width instead of the 600 px above */
+QComboBox#Dropdown[Wide_List="true"] QAbstractItemView {
+    max-width: 16777215px;
+}
 QComboBox#Dropdown QAbstractItemView::item {
     color: {Quaternary_Text};
     border-radius: 15px;

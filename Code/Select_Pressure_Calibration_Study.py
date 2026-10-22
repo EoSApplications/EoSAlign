@@ -295,6 +295,8 @@ class Select_Pressure_Calibration_Study(QWidget):
         self.Pressure_Calibration_Studies_Dropdown_Display.setObjectName("Dropdown")
         self.Pressure_Calibration_Studies_Dropdown_Display.setPlaceholderText("Select a pressure calibration study...")
         self.Pressure_Calibration_Studies_Dropdown_Display.setSizeAdjustPolicy(Dropdown.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        # Show the whole label in the closed box too, wrapped onto more lines, instead of cutting it off
+        self.Pressure_Calibration_Studies_Dropdown_Display.Set_Wrap_Selected_Text(True)
         self.Pressure_Calibration_Studies_Dropdown_Display.view().setItemDelegate(WordWrapDelegate(self.Pressure_Calibration_Studies_Dropdown_Display.view(), self.Pressure_Calibration_Studies_Dropdown_Display))
         Select_A_Pressure_Calibration_Study_Dropdown_And_Preview_Calibration_File_Button_Layout.addWidget(self.Pressure_Calibration_Studies_Dropdown_Display, stretch=1)
         # Create the preview calibration file button for the select pressure calibration study dropdown
@@ -555,6 +557,8 @@ class Select_Pressure_Calibration_Study(QWidget):
         Originally_Selected_Pressure_Calibration_Study_Dropdown = Dropdown()
         Originally_Selected_Pressure_Calibration_Study_Dropdown.setObjectName("Dropdown")
         Originally_Selected_Pressure_Calibration_Study_Dropdown.setSizeAdjustPolicy(Dropdown.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        # Show the whole label in the closed box too, wrapped onto more lines, instead of cutting it off
+        Originally_Selected_Pressure_Calibration_Study_Dropdown.Set_Wrap_Selected_Text(True)
         Originally_Selected_Pressure_Calibration_Study_Dropdown.view().setItemDelegate(
             WordWrapDelegate(
                 Originally_Selected_Pressure_Calibration_Study_Dropdown.view(),
@@ -612,6 +616,8 @@ class Select_Pressure_Calibration_Study(QWidget):
         self.Different_Pressure_Calibration_Study_Dropdown.setObjectName("Dropdown")
         self.Different_Pressure_Calibration_Study_Dropdown.setPlaceholderText("Select A Pressure Calibration Study...")
         self.Different_Pressure_Calibration_Study_Dropdown.setSizeAdjustPolicy(Dropdown.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        # Show the whole label in the closed box too, wrapped onto more lines, instead of cutting it off
+        self.Different_Pressure_Calibration_Study_Dropdown.Set_Wrap_Selected_Text(True)
         self.Different_Pressure_Calibration_Study_Dropdown.view().setItemDelegate(WordWrapDelegate(self.Different_Pressure_Calibration_Study_Dropdown.view(), self.Different_Pressure_Calibration_Study_Dropdown))
         # Populate the dropdown with pressure calibration studies that have both the originally selected composition and method AND the different composition and method
         Valid_Studies = self.Find_List_Of_All_Studies_With_Compositions_And_Methods_That_Match_The_Original_Selections_And_Pressure_Calibration_Study_Selections()
@@ -713,6 +719,8 @@ class Select_Pressure_Calibration_Study(QWidget):
         self.Final_Different_Pressure_Calibration_Study_Dropdown.setObjectName("Dropdown")
         self.Final_Different_Pressure_Calibration_Study_Dropdown.setPlaceholderText("First select a bridge study above...")
         self.Final_Different_Pressure_Calibration_Study_Dropdown.setSizeAdjustPolicy(Dropdown.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        # Show the whole label in the closed box too, wrapped onto more lines, instead of cutting it off
+        self.Final_Different_Pressure_Calibration_Study_Dropdown.Set_Wrap_Selected_Text(True)
         self.Final_Different_Pressure_Calibration_Study_Dropdown.view().setItemDelegate(WordWrapDelegate(self.Final_Different_Pressure_Calibration_Study_Dropdown.view(), self.Final_Different_Pressure_Calibration_Study_Dropdown))
         self.Final_Different_Pressure_Calibration_Study_Dropdown.setCurrentIndex(-1)
         self.Final_Different_Pressure_Calibration_Study_Dropdown.setEnabled(False)
@@ -764,13 +772,13 @@ class Select_Pressure_Calibration_Study(QWidget):
             f" | "
             f"{Metadata.get('Equation of State', '')}"
             f" | "
-            f"K0 Fixed: {Metadata.get('is_K0_fixed', '')}"
+            f"K0 Fixed: {Metadata.get('Is The Initial Bulk Modulus Fixed?', '')}"
             f" | "
-            f"cal_to: {Metadata.get('cal_to_name', '')}"
+            f"cal_to: {Metadata.get('Reference Study', '')}"
             f" | "
             f"Max Pressure: {Metadata.get('Maximum Pressure', '')} GPa"
             f" | "
-            f"PTM: {Metadata.get('PTM', '')}"
+            f"PTM: {Metadata.get('Pressure Transmitting Medium', '')}"
         ).replace("\n", "").strip()
 
 

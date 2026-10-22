@@ -8,7 +8,7 @@ import urllib.request
     # Load third party libraries
 from PySide6.QtCore import QThread, Signal, QSettings, QTimer
     # Load local libraries
-from Version import Get_Application_Information
+from Version import Get_Application_Information, Get_Platform_Asset_Info, Is_Current_Platform_Architecture_Retired
 from Installed_Applications_Registry import Register_Installed_Application
 from Message_Manager import Warning_Message, Success_Message
 
@@ -229,9 +229,22 @@ def Run_Version_Check(Parent_Window, Application_Id: str, Manual: bool = False):
 
     def On_Update_Available(Version, Release_Page_Url):
         Current_Version = Get_Current_Version(Application_Id)
+        Last_Supported_Version_Text = "an earlier version"
 
-        # Pip installs are updated with a command rather than a downloaded installer asset
-        Message_Key = "Update Available Pip Install" if Is_Pip_Install() else "Update Available"
+        # Pip installs are updated with a command rather than a downloaded installer asset.
+        # A non-pip install stuck on a platform+architecture that no longer gets a real
+        # installer/DMG/AppImage built for it (see Is_Current_Platform_Architecture_Retired)
+        # gets steered toward pip instead, rather than a normal "download it here" message
+        # that would point at an asset that no longer exists for their machine.
+        if Is_Pip_Install():
+            Message_Key = "Update Available Pip Install"
+        elif Is_Current_Platform_Architecture_Retired(Application_Id):
+            Message_Key = "Update Available Retired Architecture"
+            Last_Supported_Version = Get_Platform_Asset_Info(Application_Id).get("Last_Supported_Version")
+            if Last_Supported_Version:
+                Last_Supported_Version_Text = f"version {Last_Supported_Version}"
+        else:
+            Message_Key = "Update Available"
 
         Acknowledgement_Result, Suppress_Future_Notifications = Warning_Message(
             Parent_Window,
@@ -239,6 +252,7 @@ def Run_Version_Check(Parent_Window, Application_Id: str, Manual: bool = False):
             version=Version,
             current_version=Current_Version,
             release_url=Release_Page_Url,
+            last_supported_version_text=Last_Supported_Version_Text,
             Checkbox_Text="Do not show this message again",
         )
 

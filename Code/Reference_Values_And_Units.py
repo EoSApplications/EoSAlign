@@ -411,12 +411,17 @@ Material_Atomic_Numbers = {
 
 # List of possible units for volume
 Volume_Units = [
-
     "Å³/unit cell",             # Standard unit cell volume
     "Å³/formula unit",          # Per formula unit (e.g. NaCl pair, MgO pair)
     "Å³/atom",                  # Per atom volume (elements; or truly per-atom for cBN)
     "cm³/mol",                  # Molar volume
+]
 
+
+
+# List of possible units for pressure
+Pressure_Units = [
+    "Pressure (GPa)",
 ]
 
 
@@ -1072,6 +1077,9 @@ Calibration_File_Variable_Information = {
         # extra prep work
         # unicode equation
         # latex equation
+        # fitting information (optional -- only the equations EoSFitting can fit have it)
+            # starting guesses, keyed by the calibration file variable name of each fitted parameter
+            # parameters that must stay positive while fitting
 Function_Information = {
 
 
@@ -1094,6 +1102,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = \frac{ K_{0} }{ K_{0}^{'} } \left( \left( \frac{ V_{0} }{ V } \right)^{K_{0}^{'}} - 1 \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0, "K0_prime": 4.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
     "Second-Order Murnaghan": {
@@ -1105,6 +1117,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = 2 K_{0} \frac{ { \left( \frac{ V_{0} }{ V } \right)^{q} - 1 } }{ q \left( \left( \frac{ V_{0} }{ V } \right)^{q} + 1 \right) - K_{0}^{'} \left( \left( \frac{ V_{0} }{ V } \right)^{q} - 1 \right) }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0, "K0_prime": 4.0, "K0_dprime": 0.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
 
@@ -1121,6 +1137,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = \frac{ 3 }{ 2 } K_{0} \left( \left( \frac{ V_{0} }{ V } \right)^{ \frac{ 7 }{ 3 } } - \left( \frac{ V_{0} }{ V } \right)^{ \frac{ 5 }{ 3 } } \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
     "Third-Order Birch-Murnaghan": {
@@ -1132,6 +1152,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = \frac{ 3 }{ 2 } K_{0} \left( \left( \frac{ V_{0} }{ V } \right)^{ \frac{ 7 }{ 3 } } - \left( \frac{ V_{0} }{ V } \right)^{ \frac{ 5 }{ 3 } } \right) \left( 1 + \frac{ 3 }{ 4 } \left( K_{0}^{'} - 4 \right) \left( \left( \frac{ V_{0} }{ V } \right)^{ \frac{ 2 }{ 3 } } - 1 \right) \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0, "K0_prime": 4.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
     "Fourth-Order Birch-Murnaghan": {
@@ -1143,6 +1167,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = \frac{ 3 }{ 2 } K_{0} \left( \left( \frac{ V_{0} }{ V } \right)^{ \frac{ 7 }{ 3 } } - \left( \frac{ V_{0} }{ V } \right)^{ \frac{ 5 }{ 3 } } \right) \left( 1 + \frac{ 3 }{ 4 } \left( K_{0}^{'} - 4 \right) \left( \left( \frac{ V_{0} }{ V } \right)^{ \frac{ 2 }{ 3 } } - 1 \right) + \frac{ 3 }{ 8 } \left( K_{0} K_{0}^{''} + \left( K_{0}^{'} - 4 \right) \left( K_{0}^{'} - 3 \right) + \frac{ 35 }{ 9 } \right) \left( \left( \frac{ V_{0} }{ V } \right)^{ \frac{ 2 }{ 3 } } - 1 \right)^{ 2 } \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0, "K0_prime": 4.0, "K0_dprime": 0.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
 
@@ -1159,6 +1187,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = 3 K_{0} \frac{ 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{ 1 }{ 3 } } }{ \left( \frac{ V }{ V_{0} } \right)^{ \frac{ 2 }{ 3 } } } e^{ 1.5 \left( K_{0}^{'} - 1 \right) \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{ 1 }{ 3 } } \right) }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0, "K0_prime": 4.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
     "Extended Rydberg-Vinet": {
@@ -1170,6 +1202,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = 3 K_{0} \frac{ 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{ 1 }{ 3 } } }{ \left( \frac{ V }{ V_{0} } \right)^{ \frac{ 2 }{ 3 } } } e^{ \eta \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{ 1 }{ 3 } } \right) + \beta \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{ 1 }{ 3 } } \right)^{ 2 } + \psi \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{ 1 }{ 3 } } \right)^{ 3 } + \gamma \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{ 1 }{ 3 } } \right)^{ 4 } }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0, "eta": 3.0, "beta": 0.0, "psi": 0.0, "gamma": 0.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
 
@@ -1186,6 +1222,10 @@ Function_Information = {
         "Extra_Prep_Work": "AP2",
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = 3 K_{0} \frac{ 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } }{ \left( \frac{ V }{ V_{0} } \right)^{ \frac{5}{3} } } \left( 1 + \left( \frac{3}{2} \left( K_{0}^{'} - 3 \right) +  \ln{ \left( \frac{ 3 K_{0} }{2337} \right)} + \frac{5}{3} \ln{ \left( \frac{ V_{0} }{ Z } \right)} \right) \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } \right) \right) e^{ \left( - \ln{ \left( \frac{ 3 K_{0} }{ 2.337 \cdot 10^{3} } \right)} - \frac{5}{3} \ln{ \left( \frac{ V_{0} }{ Z } \right)} \right) \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } \right) }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 10.0, "K0": 200.0, "K0_prime": 4.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
 
@@ -1202,6 +1242,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = 3 K_{0} \frac{ 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } }{ \left( \frac{ V }{ V_{0} } \right)^{ \frac{5}{3} } } e^{ \frac{3}{2} \left( K_{0}^{'} - 3 \right) \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } \right) }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0, "K0_prime": 4.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
 
@@ -1210,7 +1254,7 @@ Function_Information = {
     ####################
 
     "Holzapfel (H12)": {
-        "Display_Name": "Holzapfel",
+        "Display_Name": "Holzapfel H12",
         "Function_Name": "Holzapfel_H12__",
         "Calibration_File_EoS_Name": "H12",
         "Calibration_File_EoS_Order": None,
@@ -1218,6 +1262,10 @@ Function_Information = {
         "Extra_Prep_Work": "AP2",
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = 3 K_{0} \frac{ 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } }{ \left( \frac{ V }{ V_{0} } \right)^{ \frac{5}{3} } } e^{ \left( - \ln{ \left( \frac{ 3 K_{0} }{ 2.337 \cdot 10^{3} } \right)} - \frac{5}{3} \ln{ \left( \frac{ V_{0} }{ Z } \right)} \right) \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } \right) + \left( \frac{3}{2} \left( K_{0}^{'} - 3 \right) + \ln{ \left( \frac{ 3 K_{0} }{ 2.337 \cdot 10^{3} } \right)} + \frac{5}{3} \ln{ \left( \frac{ V_{0} }{ Z } \right)} \right) \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } \right) }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 10.0, "K0": 200.0, "K0_prime": 4.0},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
 
@@ -1234,6 +1282,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = K_{0} \left( \left( \frac{ K_{0}^{'} }{ {K_{ \infty }^{'}}^{2} } \right) \left( \left( \frac{ V_{0} }{ V } \right)^{ K_{ \infty }^{'} } - 1 \right) - \left( \frac{ K_{0}^{'} }{ K_{ \infty }^{'} } - 1 \right) \ln{ \left( \frac{ V_{0} }{ V } \right)} \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0, "K0_prime": 4.0, "K_infinity_prime": 2.19},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
 
@@ -1250,6 +1302,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( V \right) = 3 K_{0} \left( \frac{ V }{ V_{0} } \right)^{ - K_{ \infty }^{'} } \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } \right) e^{ \left( \frac{3}{2} K_{0}^{'} - 3 K_{ \infty }^{'} + \frac{1}{2} \right) \left( 1 - \left( \frac{ V }{ V_{0} } \right)^{ \frac{1}{3} } \right) }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 100.0, "K0": 200.0, "K0_prime": 4.0, "K_infinity_prime": 2.19},
+            "Positive_Parameters": ["V0", "K0"],
+        },
     },
 
 
@@ -1272,6 +1328,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \lambda \right) = \frac{ \lambda - \lambda_{0} }{ A }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 694.2, "A": 100.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
 
@@ -1288,6 +1348,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \lambda \right) = \frac{A}{B} \left( \left( \frac{ \lambda }{ \lambda_{0} } \right)^{B} - 1 \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 694.2, "A": 1900.0, "B": 7.65},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
 
@@ -1304,6 +1368,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \lambda \right) = A \cdot \frac{ \lambda - \lambda_{0} }{ \lambda_{0} } \cdot \left( 1 + B \cdot \frac{ \lambda - \lambda_{0} }{ \lambda_{0} } \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 694.2, "A": 100.0, "B": 0.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
 
@@ -1320,6 +1388,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \lambda \right) = \frac{ A }{ B + C } \left(e^{ \left( \frac{ B + C }{ C } \left( 1 - \frac{ \lambda }{ \lambda_{0} }^{ -C } \right) \right)} - 1 \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 694.2, "A": 1904.0, "B": 7.665, "C": 1.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
 
@@ -1336,6 +1408,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \lambda \right) = A \cdot \Delta \lambda \frac{ 1 + B \Delta \lambda }{ 1 + C \Delta \lambda }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 694.2, "A": 1.0, "B": 0.0, "C": 0.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
 
@@ -1362,6 +1438,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \upsilon \right) = A + B \upsilon + C \upsilon^{2}",
+        "Fitting_Information": {
+            "Starting_Guesses": {"A": -4400.0, "B": 3.36, "C": -0.000325},
+            "Positive_Parameters": [],
+        },
     },
 
     "Akahama & Kawamura 2006 (Diamond, Finite Strain Approximation)": {
@@ -1373,6 +1453,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \upsilon \right) = A \left( \frac{ \upsilon - \upsilon_{0} }{ \upsilon_{0} } \right) \left( 1 + \frac{ \left( B - 1 \right) \left( \frac{ \upsilon - \upsilon_{0} }{ \upsilon_{0} } \right) }{2} \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 1333.0, "A": 547.0, "B": 3.75},
+            "Positive_Parameters": ["V0", "A"],
+        },
     },
 
     "Akahama & Kawamura 2010 (Diamond)": {
@@ -1384,6 +1468,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"\begin{aligned} P \left( \upsilon , \text{ if } < 200 \text{ GPa} \right) &= A \left( \frac{ \upsilon - \upsilon_{0} }{ \upsilon_{0} } \right) \left( 1 + \frac{ \left( B - 1 \right) \left( \frac{ \upsilon - \upsilon_{0} }{ \upsilon_{0} } \right) }{2} \right) \\ P \left( \upsilon , \text{ if } \geq 200 \text{ GPa} \right) &= C - D \upsilon + E \upsilon^{2} \end{aligned}",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 1333.0, "A": 547.0, "B": 3.75, "C": 12000.0, "D": 8.0, "E": 0.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
     "Eremets et al. 2023 (Diamond)": {
@@ -1395,12 +1483,11 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \upsilon \right) = A \left( \frac{ \upsilon - \upsilon_{0} }{ \upsilon_{0} } \right) + B \left( \frac{ \upsilon - \upsilon_{0} }{ \upsilon_{0} } \right)^{2}",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 1333.0, "A": 0.5, "B": 0.0001},
+            "Positive_Parameters": ["V0"],
+        },
     },
-
-
-    ####################
-    # Linear Scale
-    ####################
 
     "Linear Scale - Raman": {
         "Display_Name": "Linear Scale",
@@ -1411,6 +1498,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \lambda \right) = \frac{ \lambda - \lambda_{0} }{ A }",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 1360.0, "A": 1.5},
+            "Positive_Parameters": [],
+        },
     },
 
 
@@ -1427,6 +1518,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"\upsilon \left( P \right) = A + B P + C P^{2}",
+        "Fitting_Information": {
+            "Starting_Guesses": {"A": 450.0, "B": 2.8, "C": -0.01},
+            "Positive_Parameters": [],
+        },
     },
 
     "Olijnyk et al. 2001 (Beryllium & Rhenium, Polynomial)": {
@@ -1438,6 +1533,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \upsilon \right) = \left( \frac{A}{B} \right) \left( {1 - \frac{ \upsilon }{ \upsilon_{0} } }^{- \frac{B}{A^{2}}} \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 120.0, "A": 0.005, "B": 0.0},
+            "Positive_Parameters": [],
+        },
     },
 
     "Pease et al. 2025 (Rhenium, Polynomial)": {
@@ -1449,6 +1548,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \upsilon \right) = A \left( \upsilon - \upsilon_{0} \right) + B \left( \upsilon - \upsilon_{0} \right)^{2}",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 1333.0, "A": 0.5, "B": 0.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
     "Goncharov et al. 2005 (Cubic Boron Nitride)": {
@@ -1460,6 +1563,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \upsilon \right) = \frac{ A }{ B } \left( \left( \frac{ \upsilon }{ \upsilon_{0} } \right)^{B} - 1 \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 1333.0, "A": 3.0, "B": 7.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
     "Datchi & Canny 2004 (Cubic Boron Nitride)": {
@@ -1471,6 +1578,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"\upsilon \left( P, T \right) = \upsilon_{0} + A T + B T^{2} + \left( C + D T + E T^{2} \right) P + F P^{2}",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 1333.0, "A": 0.0, "B": 0.0, "C": 3.0, "D": 0.0, "E": 0.0, "F": 0.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
     "Ren et al. 2023 (Cubic Boron Nitride)": {
@@ -1482,6 +1593,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"\upsilon \left( P \right) = \upsilon_{0} + A P + B P^{2}",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 1333.0, "A": 0.5, "B": 0.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
     "Datchi et al. 2007 (Cubic Boron Nitride)": {
@@ -1493,6 +1608,10 @@ Function_Information = {
         "Extra_Prep_Work": None,
         "Unicode_Equation": "",
         "Latex_Equation": r"P \left( \upsilon \right) = \frac{ A }{3.62} \left( \left( \frac{ \upsilon }{ \upsilon_{0} } \right)^{2.876} - 1 \right)",
+        "Fitting_Information": {
+            "Starting_Guesses": {"V0": 1333.0, "A": 3.0},
+            "Positive_Parameters": ["V0"],
+        },
     },
 
 }

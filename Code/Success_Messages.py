@@ -64,6 +64,16 @@ List_Of_Success_Messages = {
         "Message": "Data saved to {filename}",
     },
 
+    "Fitting CSV Save Success": {
+        "Title": "Save Successful",
+        "Message": "Data saved to {filename}",
+    },
+
+    "Fitting Figure Save Success": {
+        "Title": "Save Successful",
+        "Message": "Figure saved to {filename}",
+    },
+
     "Mac Terminal Commands Installed": {
         "Title": "Terminal Commands Installed",
         "Message": "The terminal commands were installed successfully. Open a new Terminal window to use them.",

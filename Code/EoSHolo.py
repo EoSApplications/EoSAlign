@@ -725,6 +725,8 @@ def Build_EoSHolo_Window():
             self.Study_Dropdown.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             self.Study_Dropdown.setPlaceholderText("Select a pressure calibration study...")
             self.Study_Dropdown.setSizeAdjustPolicy(Dropdown.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+            # Show the whole study label in the closed box too, wrapped onto more lines, instead of cutting it off
+            self.Study_Dropdown.Set_Wrap_Selected_Text(True)
             self.Study_Dropdown.view().setItemDelegate(
                 WordWrapDelegate(self.Study_Dropdown.view(), self.Study_Dropdown)
             )

@@ -1690,6 +1690,8 @@ class View_Edit_And_Save_Calibration_Files_In_A_New_Window(QDialog):
         self.Study_Selector.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.Study_Selector.setMaxVisibleItems(20)
         self.Study_Selector.setPlaceholderText('Select a study')
+        # Show the whole study label in the closed box too, wrapped onto more lines, instead of cutting it off
+        self.Study_Selector.Set_Wrap_Selected_Text(True)
         self.Study_Selector.view().setItemDelegate(
             WordWrapDelegate(self.Study_Selector.view(), self.Study_Selector)
         )

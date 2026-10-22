@@ -9,37 +9,13 @@ from uuid import uuid4
 from Settings import Settings
 from Plot_Window import Plot_Window
 from Conversion_Window import Data_Preview_Dialog
+from Column_Labels import Get_Save_Column_Labels
+from Reference_Values_And_Units import Pressure_Units
 from EoS_Math.Build_Dataframe import Build_Dataframe, Translate_Pressure_Calibration_Study, Calibration_Metadata
 from Message_Manager import Warning_Message, Success_Message
 
 
 
-
-
-# Build the {Pressure_<key> -> Pressure_<study> | <comp> | <method> | ...} rename map used by
-# CSV export, from a dataframe's own columns and the loaded Calibration_Metadata. Pulled out to
-# a module-level function (rather than inlined in When_Export_Button_Is_Clicked) so it can be
-# unit-tested against a synthetic dataframe + metadata dict without needing a live Qt widget --
-# see tests/export/.
-def Build_Pressure_Column_Rename_Map(DataFrame_Columns, Metadata_By_Calibration_Key):
-
-    Rename_Map = {}
-    for col in DataFrame_Columns:
-        if col.startswith("Pressure_") and not col.startswith("Pressure_From_"):
-            cal_name = col[len("Pressure_"):]
-            meta = Metadata_By_Calibration_Key.get(cal_name, {})
-            if meta:
-                study = meta.get("Study", cal_name)
-                comp = meta.get("Composition", "")
-                method = meta.get("Method", "")
-                eos = meta.get("Equation of State", "")
-                k0_fixed = meta.get("Is The Initial Bulk Modulus Fixed?", "")
-                cal_to = meta.get("Reference Study", "")
-                max_p = meta.get("Maximum Pressure", "")
-                ptm = meta.get("Pressure Transmitting Medium", "")
-                Rename_Map[col] = f"Pressure_{study} | {comp} | {method} | {eos} | K0 Fixed: {k0_fixed} | cal_to: {cal_to} | Max Pressure: {max_p} | PTM: {ptm}"
-    # Return the column rename map for use with DataFrame.rename(columns=...)
-    return Rename_Map
 
 
 # Build the "_solved_pressures.csv" subset: the measured column plus every renamed pressure
@@ -48,7 +24,7 @@ def Build_Pressure_Column_Rename_Map(DataFrame_Columns, Metadata_By_Calibration_
 def Build_Solved_Pressures_Dataframe(Export_DataFrame, Display_Units):
 
     Measured_Col = Export_DataFrame.columns[0]
-    Pressure_Cols = [col for col in Export_DataFrame.columns if col.startswith("Pressure_") and " | " in col]
+    Pressure_Cols = [col for col in Export_DataFrame.columns if col.startswith(f"Output: {Pressure_Units[0]}") and " | " in col]
     if not Pressure_Cols:
         return None
     Pressures_Only = Export_DataFrame[[Measured_Col] + Pressure_Cols].copy()
@@ -520,11 +496,11 @@ class Select_Final_Actions(QWidget):
 
         try:
             # Build rename map for output pressure columns
-            Rename_Map = Build_Pressure_Column_Rename_Map(self.DataFrame.columns, Calibration_Metadata)
+            Rename_Map = Get_Save_Column_Labels(self.DataFrame.columns, Calibration_Metadata)
 
             # Save the main dataframe (with renamed columns)
             Export_DF = self.DataFrame.rename(columns=Rename_Map)
-            Export_DF.to_csv(Filename, index=False)
+            Export_DF.to_csv(Filename, index=False, encoding="utf-8-sig")
 
             # Get the units from data or use stored units
             Units = self.Data.get("Units", self.Units) if self.Data else self.Units
@@ -539,7 +515,7 @@ class Select_Final_Actions(QWidget):
                 if Pressures_Only is not None:
                     Base, Ext = os.path.splitext(Filename)
                     Pressures_Filename = f"{Base}_solved_pressures.csv"
-                    Pressures_Only.to_csv(Pressures_Filename, index=False)
+                    Pressures_Only.to_csv(Pressures_Filename, index=False, encoding="utf-8-sig")
 
                     Success_Message(self, "CSV Save Success", filename=Filename, pressures_filename=Pressures_Filename)
                 else:

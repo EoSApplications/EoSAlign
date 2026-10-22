@@ -22,6 +22,11 @@ List_Of_Warning_Messages = {
         "Message": "Version {version} is available (you have {current_version}).<br><br>Run the following command to update:<br><br>&nbsp;&nbsp;&nbsp;&nbsp;pip install --upgrade eosapplications<br><br>Release notes:<br><a href=\"{release_url}\">{release_url}</a>",
     },
 
+    "Update Available Retired Architecture": {
+        "Title": "Update Available (Installer No Longer Built For Your System)",
+        "Message": "Version {version} is available (you have {current_version}), but an installer is no longer built for your system's architecture (last supported in {last_supported_version_text}).<br><br>Switch to a pip install instead to keep receiving updates:<br><br>&nbsp;&nbsp;&nbsp;&nbsp;pip install eosapplications<br><br>Release notes:<br><a href=\"{release_url}\">{release_url}</a>",
+    },
+
     "Failed to Update Calibrations": {
         "Title": "Failed to Update Calibrations",
         "Message": "The calibration files could not be downloaded:\n{message}",
@@ -377,6 +382,87 @@ List_Of_Warning_Messages = {
     },
 
 
+
+
+    ########################################
+    # EoSFitting Enter Data Warnings
+    ########################################
+
+
+    "Not Enough Fitting Data": {
+        "Title": "Not Enough Fitting Data",
+        "Message": "At least 2 data points are needed to fit the models.\n\tEach data point needs a measurement and a pressure",
+    },
+
+    "Fitting Uncertainty Missing Values": {
+        "Title": "Missing Uncertainty Values",
+        "Message": "The {column_name} column has values for {entered_count} of {row_count} rows.\n\tEnter a value for every row, or leave the whole column empty",
+    },
+
+    "Fitting Uncertainty Not Entered": {
+        "Title": "Missing Uncertainty Values",
+        "Message": "Error propagation is enabled but no uncertainty values were entered.\n\tEnter the uncertainties, or turn off Enable Error Propagation",
+    },
+
+    "Fitting Uncertainty Not Valid": {
+        "Title": "Invalid Uncertainty Values",
+        "Message": "Every {column_name} value must be a number greater than zero",
+    },
+
+    "Fitting Value Not A Number": {
+        "Title": "Value Is Not A Number",
+        "Message": "Row {row_number} of the {column_name} column is not a number: {value}\n\tEnter numbers only, or clear the cell",
+    },
+
+    "Fitting Columns Have Different Numbers Of Values": {
+        "Title": "Columns Have Different Numbers Of Values",
+        "Message": "The columns do not have the same number of values:\n{details}\n\tThe measurement and pressure columns, and any uncertainty column that has values, must all have the same number of values",
+    },
+
+    "Fitting Row Is Incomplete": {
+        "Title": "Row Is Incomplete",
+        "Message": "Row {row_number} has a value for {filled_names} but not for {missing_names}\n\tEvery row needs a value in each column that is used, or must be empty",
+    },
+
+    "Fitting File Has No Data": {
+        "Title": "No Data In The File",
+        "Message": "No numeric data was found in the file.\n\tThe file must have 2 columns (measurement, pressure) or 4 columns (measurement, measurement uncertainty, pressure, pressure uncertainty). A header or title above the data is allowed",
+    },
+
+    "Missing Fitting File Layout": {
+        "Title": "Missing Upload Option",
+        "Message": "Please choose how the data is stored:\n\t- One File: all the values are in one file\n\t- Multiple Files: the values are in different files",
+    },
+
+    "Fitting File Not Selected": {
+        "Title": "Missing File",
+        "Message": "Please select a file and a column for {column_name}",
+    },
+
+    "Fitting File Column Lengths Differ": {
+        "Title": "Columns Have Different Lengths",
+        "Message": "The selected columns do not have the same number of values:\n{details}\n\tAll columns must have the same number of entries",
+    },
+
+    "Fitting Same Column Selected": {
+        "Title": "Same Column Selected Twice",
+        "Message": "The same column of the same file is selected for {first_name} and {second_name}.\n\tPlease select a different column for one of them",
+    },
+
+    "Fitting File Uneven Columns": {
+        "Title": "Columns Have Different Lengths",
+        "Message": "Line {line_number} of the file has {found_count} values but the data starts with {expected_count} values per line.\n\tAll columns must have the same number of entries",
+    },
+
+    "Fitting File Not Numeric": {
+        "Title": "Values Are Not Numbers",
+        "Message": "Line {line_number} of the file has values that are not numbers:\n\t{line_text}\n\tOnly lines above the data may be a header or title",
+    },
+
+    "Fitting Nothing To Export": {
+        "Title": "Export Error",
+        "Message": "{message}",
+    },
 
 }
 

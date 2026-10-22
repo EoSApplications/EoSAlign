@@ -89,14 +89,13 @@ def Get_Managed_Application_Status(Application_Id):
     return Status_Information
 
 
-# Return True when EoSFitting.py currently sits next to this wrapper in Code/
-# (still under development -- it lives at the repo root by default, so it is
-# only treated as a managed child application once it is moved back)
+# Return True when EoSFitting is switched on (Version.EoSFitting_Menu_Enabled) and can
+# be launched from this install context (EoSFitting.py sits next to this wrapper in Code/)
 def Is_EoSFitting_Available():
 
     from Version import EoSFitting_Menu_Enabled
 
-    # EoSFitting is not ready to be offered as a selectable application yet
+    # EoSFitting has been switched off, so do not offer it as a selectable application
     if not EoSFitting_Menu_Enabled:
         return False
 
@@ -164,7 +163,7 @@ def Sync_Bundled_Managed_Applications_With_The_Local_Registry():
 
 
 
-# Make a launch window for EoSAlign and EoSHolo (plus EoSFitting, if present in Code/)
+# Make a launch window for EoSAlign, EoSHolo, and EoSFitting
 def Make_The_Application_Launch_Window():
 
     # Load libraries
@@ -255,7 +254,7 @@ def Make_The_Application_Launch_Window():
             self.EoSAlign_Application_Card = Application_Card(
                 Application_Logo_Path="Graphics/EoSAlign_With_Sun.png",
                 Application_Title_Text="EoSAlign",
-                Application_Description_Text=("Convert and compare high-pressure experimental data across different equations of state calibrations."),
+                Application_Description_Text=("Convert and compare high-pressure experimental data across different equations of state calibrations"),
             )
             self.EoSAlign_Application_Card.Application_Card_Clicked.connect(self.Launch_EoSAlign)
 
@@ -263,20 +262,19 @@ def Make_The_Application_Launch_Window():
             self.EoSHolo_Application_Card = Application_Card(
                 Application_Logo_Path="Graphics/EoSHolo_With_Sun.png",
                 Application_Title_Text="EoSHolo",
-                Application_Description_Text=("Explore the network of equation of state calibrations as an interactive graph."),
+                Application_Description_Text=("Explore the network of equation of state calibrations as an interactive graph"),
             )
             self.EoSHolo_Application_Card.Application_Card_Clicked.connect(self.Launch_EoSHolo)
 
             # Create the application card for EoSFitting only when it is actually
-            # available in this install context (it lives at the repo root under
-            # development by default, and only becomes a managed child once it is
-            # moved back into Code/, next to this wrapper)
+            # available in this install context (switched on in Version.py and
+            # launchable next to this wrapper)
             self.EoSFitting_Application_Card = None
             if Is_EoSFitting_Available():
                 self.EoSFitting_Application_Card = Application_Card(
-                    Application_Logo_Path="Graphics/EoS_With_Sun.png",
+                    Application_Logo_Path="Graphics/EoSFitting_With_Sun.PNG",
                     Application_Title_Text="EoSFitting",
-                    Application_Description_Text=("Fit equations of state to P–V, P–λ, or P–ν data with Monte Carlo error propagation and pressure-scale alignment."),
+                    Application_Description_Text=("UNDER DEVELOPMENT: Fit equations of state to measured values and pressure"),
                 )
                 self.EoSFitting_Application_Card.Application_Card_Clicked.connect(self.Launch_EoSFitting)
 

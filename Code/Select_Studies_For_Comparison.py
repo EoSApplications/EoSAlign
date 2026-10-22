@@ -8,7 +8,9 @@ from PySide6.QtCore import Qt
 from functools import partial
     # Load local functions from local files
 from EoS_Math.Build_Dataframe import Calibration_Metadata, Build_Dataframe, Translate_Pressure_Calibration_Study
+from EoS_Math.Custom_Reference import Custom_Reference_Type_For_Each_Method
 from Conversion_Window import Data_Preview_Dialog
+from Column_Labels import Get_Save_Column_Labels
 from View_Edit_And_Save_Calibration_Files_In_A_New_Window import View_Edit_And_Save_Calibration_Files_In_A_New_Window, Preview_Calibration_File_For_File_Path, Preview_Calibration_File_For_Dropdown
 from Collapsible_Sections import CheckboxRow
 from Message_Manager import Warning_Message
@@ -172,10 +174,10 @@ class Select_Studies_For_Comparison(QWidget):
             Composition_Val = Study_Metadata.get("Composition", "")
             Method_Val = Study_Metadata.get("Method", "")
             Equation_Of_State = Study_Metadata.get("Equation of State", "")
-            is_K0_fixed = Study_Metadata.get("is_K0_fixed", "")
-            cal_to_Study_Name = Study_Metadata.get("cal_to_name", "")
+            is_K0_fixed = Study_Metadata.get("Is The Initial Bulk Modulus Fixed?", "")
+            cal_to_Study_Name = Study_Metadata.get("Reference Study", "")
             Maximum_Pressure = Study_Metadata.get("Maximum Pressure", "")
-            Pressure_Transmitting_Medium = Study_Metadata.get("PTM", "")
+            Pressure_Transmitting_Medium = Study_Metadata.get("Pressure Transmitting Medium", "")
             # Build a more detailed checkbox text
             Checkbox_Text = (
                 f"{Study_Name}"
@@ -619,14 +621,7 @@ class Select_Studies_For_Comparison(QWidget):
                 Uncertainty = 0.0
         
         # Determine the type based on method
-        if self.Method == "XRD":
-            Ref_Type = "V0"
-        elif self.Method == "Luminescence":
-            Ref_Type = "lambda_0"
-        elif self.Method == "Raman":
-            Ref_Type = "nu_0"
-        else:
-            Ref_Type = "unknown"
+        Ref_Type = Custom_Reference_Type_For_Each_Method.get(self.Method, "unknown")
         
         return {'value': Value, 'uncertainty': Uncertainty, 'type': Ref_Type, 'method': self.Method}
 
@@ -665,7 +660,8 @@ class Select_Studies_For_Comparison(QWidget):
             from PySide6.QtWidgets import QFileDialog
             path, _ = QFileDialog.getSaveFileName(self, "Export Converted Pressures", "", "CSV (*.csv)")
             if path:
-                DF.to_csv(path, index=False, encoding="utf-8-sig")
+                # Rename columns with the shared save labels so this export matches the Final Actions export
+                DF.rename(columns=Get_Save_Column_Labels(DF.columns, Calibration_Metadata)).to_csv(path, index=False, encoding="utf-8-sig")
 
         Preview_Dialog = Data_Preview_Dialog(DF, self, Export_Callback=_export_preview)
         Preview_Dialog.show()

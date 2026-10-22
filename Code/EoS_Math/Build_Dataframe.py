@@ -4,14 +4,14 @@ import numpy as np
 import pandas as pd
     # Load local libraries
 try:
-    from ..Reference_Values_And_Units import Method_Units, Volume_Units
+    from ..Reference_Values_And_Units import Method_Units, Volume_Units, Pressure_Units
 except ImportError:
-    from Reference_Values_And_Units import Method_Units, Volume_Units
+    from Reference_Values_And_Units import Method_Units, Volume_Units, Pressure_Units
 from .Volume_Conversion_Functions import (
-    Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Unit_Cell,
-    Convert_Angstroms_Cubed_Per_Atom__To__Angstroms_Cubed_Per_Unit_Cell,
-    Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Unit_Cell,
+    Check_If_The_Volume_Is_In_Angstroms_Cubed_Per_Unit_Cell,
+    Convert_All_Volumes_To_Angstroms_Cubed_Per_Unit_Cell,
 )
+from .Custom_Reference import Convert_The_Custom_Reference_To_Unit_Cell_Volume
 from . import Parse_Calibration_Information
 from .Parse_Calibration_Information import Rebuild_One_Calibration_To_Use_A_User_Inputted_Reference_Value as Make_Calibration_With_Custom_Reference
 from .Error_Propagation_Functions import Propagate_Forward, Propagate_Inverse
@@ -28,7 +28,7 @@ from .Create_List_Of_Functions_And_Variables import Load_List_Of_Functions_And_V
 List_Of_Functions_And_Variables = Load_List_Of_Functions_And_Variables()
 # List of valid input data units
     # Added pressure to the list of method units
-Valid_Units = ["Pressure (GPa)"] + list(Method_Units.values())
+Valid_Units = Pressure_Units + list(Method_Units.values())
 
 
 
@@ -148,34 +148,6 @@ def Read_Input_Data_From_A_File(File_Path):
 
     # Return the values and any error message
     return Values, Error_Message
-
-
-
-# Check whether a volume unit is already A^3/unit cell
-def Check_If_The_Volume_Is_In_Angstroms_Cubed_Per_Unit_Cell(Volume_Unit):
-
-    # Check if the volume unit is Angstroms cubed per unit cell
-    return Volume_Unit == Volume_Units[0]
-
-
-
-# Convert a list of volumes to A^3/unit cell using direct conversion helpers
-def Convert_All_Volumes_To_Angstroms_Cubed_Per_Unit_Cell(Volume_Values, Volume_Unit, Composition):
-    
-    # Check if the volume is Angstroms cubed per unit cell
-    if Volume_Unit == Volume_Units[0]:
-        return [float(Value) for Value in Volume_Values]
-    if Volume_Unit == Volume_Units[1]:
-        Converter = Convert_Angstroms_Cubed_Per_Formula_Unit__To__Angstroms_Cubed_Per_Unit_Cell
-    elif Volume_Unit == Volume_Units[2]:
-        Converter = Convert_Angstroms_Cubed_Per_Atom__To__Angstroms_Cubed_Per_Unit_Cell
-    elif Volume_Unit == Volume_Units[3]:
-        Converter = Convert_Centimeters_Cubed_Per_Mole__To__Angstroms_Cubed_Per_Unit_Cell
-    else:
-        raise ValueError(f"Unknown volume unit '{Volume_Unit}'. Expected one of: {Volume_Units}")
-
-    # Return the converted volumes in Angstroms cubed per unit cell
-    return [Converter(Value, Composition) for Value in Volume_Values]
 
 
 
@@ -360,16 +332,7 @@ def Build_Dataframe(Data, Units, Composition, Method, Pressure_Calibration_Study
             Data_Values = Convert_All_Volumes_To_Angstroms_Cubed_Per_Unit_Cell(Data_Values, Volume_Unit, Composition)
             if Error_Propagation and any(Uncertainty_Value != 0 for Uncertainty_Value in Uncertainty_Values):
                 Uncertainty_Values = Convert_All_Volumes_To_Angstroms_Cubed_Per_Unit_Cell(Uncertainty_Values, Volume_Unit, Composition)
-            if Custom_Reference is not None and Custom_Reference.get('type') == 'V0':
-                Custom_V0 = Custom_Reference.get('value')
-                Custom_V0_Uncertainty = Custom_Reference.get('uncertainty', 0)
-                if Custom_V0 is not None:
-                    Converted_V0 = Convert_All_Volumes_To_Angstroms_Cubed_Per_Unit_Cell([Custom_V0], Volume_Unit, Composition)
-                    Custom_Reference = dict(Custom_Reference)
-                    Custom_Reference['value'] = Converted_V0[0]
-                    if Custom_V0_Uncertainty:
-                        Converted_V0_Uncertainty = Convert_All_Volumes_To_Angstroms_Cubed_Per_Unit_Cell([Custom_V0_Uncertainty], Volume_Unit, Composition)
-                        Custom_Reference['uncertainty'] = Converted_V0_Uncertainty[0]
+            Custom_Reference = Convert_The_Custom_Reference_To_Unit_Cell_Volume(Custom_Reference, Volume_Unit, Composition)
         except ValueError as Exception_Message:
             File_OK = False
             Error_Message = f"Volume conversion error: {Exception_Message}"
@@ -388,10 +351,12 @@ def Build_Dataframe(Data, Units, Composition, Method, Pressure_Calibration_Study
             if Needs_Conversion:
                 Unit_Label = (Volume_Unit.replace("(", "").replace(")", "").replace(" ", "_").replace("/", "_per_"))
                 Measured_Column = 'Volume_A3_UnitCell'
-                Data_Dictionary = {f'Input_{Unit_Label}':Original_Values, Measured_Column:Data_Values}
-                # Add the uncertainty values to the dataframe if error propagation is on
+                Data_Dictionary = {f'Input_{Unit_Label}':Original_Values}
+                # Add the uncertainty values right after their value column if error propagation is on
                 if Error_Propagation:
                     Data_Dictionary[f'Input_{Unit_Label}_Unc'] = Original_Uncertainty_Values
+                Data_Dictionary[Measured_Column] = Data_Values
+                if Error_Propagation:
                     Data_Dictionary[f'{Measured_Column}_Unc'] = Uncertainty_Values
             else:
                 if "Volume" in str(Input_Units) and Volume_Unit is not None:

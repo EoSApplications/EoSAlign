@@ -9,7 +9,7 @@ from PySide6.QtGui import QIcon, QKeySequence, QShortcut
 from Loading_Message import Get_Resource_Path
 from MenuBar import MainMenuBar
 from Banner import Banner
-from EoS_Math.Build_Dataframe import Calibration_Metadata
+from Column_Labels import Get_Preview_Column_Labels
 
 
 
@@ -124,82 +124,9 @@ class Data_Preview_Dialog(QDialog):
         self.Data_Table.setRowCount(Dataframe.shape[0])
         self.Data_Table.setColumnCount(Dataframe.shape[1])
 
-        # Create descriptive header labels based on column naming conventions
-        Header_Labels = []
-        for Column_Name in Dataframe.columns.tolist():
-
-            if Column_Name.startswith("Measured_"):
-                # Input measured values (non-pressure units)
-                Label = Column_Name.replace("Measured_", "Input: ").replace("_Input", "")
-                Header_Labels.append(Label)
-
-            elif Column_Name.startswith("Input_Pressure_"):
-                # Input pressure values
-                Header_Labels.append("Input:\nPressure (GPa)")
-
-            elif "_From_" in Column_Name and not Column_Name.startswith("Pressure_From_"):
-                # Intermediate observable: "{Unit}_From_{Study}" or "{Unit}_From_{Study}_({Comp}_{Method})"
-                unit_label, study_and_rest = Column_Name.split("_From_", 1)
-                if "_(" in study_and_rest:
-                    study, comp_method_raw = study_and_rest.rsplit("_(", 1)
-                    comp_method = comp_method_raw.rstrip(")").replace("_", " / ")
-                    Header_Labels.append(f"{unit_label}\nFrom {study}\n({comp_method})")
-                else:
-                    Header_Labels.append(f"{unit_label}\nFrom {study_and_rest}")
-
-            elif Column_Name.startswith("Pressure_From_") and "(" in Column_Name:
-                # Pressure conversion steps with composition/method info
-                Parts = Column_Name.replace("Pressure_From_", "").split("(")
-                Study = Parts[0].strip("_")
-                Comp_Method = Parts[1].rstrip(")").replace("_", " / ")
-                Header_Labels.append(f"Pressure\nFrom {Study}\n({Comp_Method})")
-
-            elif Column_Name.startswith("Assumed_Equal_Pressure_"):
-                # Assumption step showing pressure equality between two studies
-                Parts = Column_Name.replace("Assumed_Equal_Pressure_", "").split("_=_")
-                if len(Parts) == 2:
-                    Study_1 = Parts[0]
-                    Study_2 = Parts[1]
-                    Header_Labels.append(f"Assumption:\n{Study_1}\n= {Study_2}\n(Pressure)")
-                else:
-                    Header_Labels.append(Column_Name.replace("_", " "))
-
-            elif Column_Name.startswith("Pressure_") and not Column_Name.startswith("Pressure_From_"):
-                # Output pressure columns — look up study display name from metadata
-                cal_name = Column_Name[len("Pressure_"):]
-                metadata = Calibration_Metadata.get(cal_name, {})
-                study = metadata.get("Study", cal_name)
-                Header_Labels.append(f"Output:\nPressure (GPa)\n{study}")
-
-            elif Column_Name.startswith("Output: "):
-                Label = Column_Name[len("Output: "):]
-                if Label.endswith("_Unc"):
-                    Header_Labels.append(f"Output Unc:\n{Label[:-4]}")
-                else:
-                    Header_Labels.append(f"Output:\n{Label}")
-
-            elif Column_Name == 'Volume_A3_UnitCell':
-                Header_Labels.append("Volume (Å³/unit cell)\n(converted; used for calculations)")
-
-            elif Column_Name == 'Volume_A3_UnitCell_Unc':
-                Header_Labels.append("Volume Unc (Å³/unit cell)")
-
-            elif Column_Name.startswith("Input_") and not Column_Name.startswith("Input_Pressure_"):
-                # Original input values before unit conversion (e.g. cm³/mol → Å³/unit cell)
-                if Column_Name.endswith("_Unc"):
-                    original_label = Column_Name[len("Input_"):-len("_Unc")].replace("_per_", "/").replace("_", " ")
-                    Header_Labels.append(f"Input Unc (original):\n{original_label}")
-                else:
-                    original_label = Column_Name[len("Input_"):].replace("_per_", "/").replace("_", " ")
-                    Header_Labels.append(f"Input (original):\n{original_label}")
-
-            else:
-                # Default formatting: replace underscores with spaces
-                if " | " in Column_Name:
-                    Parts = Column_Name.split(" | ")
-                    Header_Labels.append("\n".join(Parts))
-                else:
-                    Header_Labels.append(Column_Name.replace("_", " "))
+        # Create descriptive header labels from the shared preview label function
+        Preview_Labels = Get_Preview_Column_Labels(Dataframe.columns.tolist())
+        Header_Labels = [Preview_Labels[Column_Name] for Column_Name in Dataframe.columns.tolist()]
 
         self.Data_Table.setHorizontalHeaderLabels(Header_Labels)
 
