@@ -11,7 +11,8 @@ from EoS_Math.Fitting_Functions import Fit_Fitting_Model, Make_Measurement_Grid,
 # Fit every checked model to the data
     # Read_Parameters(Model_Name, Model) -> (guesses, fixed parameter names, fixed uncertainties)
     # Read_Composition_Inputs(Model) -> (effective Z, atoms per volume unit), both None if the model does not need them
-def Run_Fits(Checked_Models, Read_Parameters, Read_Composition_Inputs, Measurement, Sigma_Measurement, Pressure, Sigma_Pressure, Reference_Pressure, Random_Generator):
+    # Volume_Unit: the unit of the measured volume (one of Volume_Units), so AP2 and H12 can change cm³/mol to Å³/atom
+def Run_Fits(Checked_Models, Read_Parameters, Read_Composition_Inputs, Measurement, Sigma_Measurement, Pressure, Sigma_Pressure, Reference_Pressure, Random_Generator, Volume_Unit=None):
 
     Fit_Results = {}
     Reports = []
@@ -22,13 +23,14 @@ def Run_Fits(Checked_Models, Read_Parameters, Read_Composition_Inputs, Measureme
         try:
             Effective_Z, Atoms_Per_Unit = Read_Composition_Inputs(Model)
             Guesses, Fixed, Fixed_Uncertainties = Read_Parameters(Model_Name, Model)
-            Fit = Fit_Fitting_Model(Model, Guesses, Fixed, Fixed_Uncertainties, Measurement, Pressure, Sigma_Measurement, Sigma_Pressure, Measurement_Dense, Random_Generator, Reference_Pressure, Effective_Z, Atoms_Per_Unit)
+            Fit = Fit_Fitting_Model(Model, Guesses, Fixed, Fixed_Uncertainties, Measurement, Pressure, Sigma_Measurement, Sigma_Pressure, Measurement_Dense, Random_Generator, Reference_Pressure, Effective_Z, Atoms_Per_Unit, Volume_Unit=Volume_Unit)
             Fit_Results[Model_Name] = {
                 **Fit,
                 "entry": Model,
                 "meas_dense": Measurement_Dense,
                 "z_val": Effective_Z,
                 "atoms_per_unit": Atoms_Per_Unit,
+                "volume_unit": Volume_Unit,
             }
             Reports.append(f"=== {Model_Name} ===\n{Fit['result'].fit_report()}\n")
         except Exception as Error:
@@ -61,7 +63,7 @@ def Run_Alignment(Fit_Results, Source_Calibration, Target_Calibrations, Read_Par
                 _, Fixed, Fixed_Uncertainties = Read_Parameters(Model_Name, Model)
                 Guesses = {Parameter["name"]: Original_Fit["result"].params[Parameter["name"]].value for Parameter in Model["params"] if Parameter["name"] in Original_Fit["result"].params}
                 # The fit weights by 1/sigma of the converted pressure, folding in 1/sigma of the measurement through the effective variance
-                Fit = Fit_Fitting_Model(Model, Guesses, Fixed, Fixed_Uncertainties, Measurement, Converted_Pressure, Sigma_Measurement, Converted_Sigma_Pressure, Original_Fit["meas_dense"], Random_Generator, Reference_Pressure, Original_Fit["z_val"], Original_Fit.get("atoms_per_unit"))
+                Fit = Fit_Fitting_Model(Model, Guesses, Fixed, Fixed_Uncertainties, Measurement, Converted_Pressure, Sigma_Measurement, Converted_Sigma_Pressure, Original_Fit["meas_dense"], Random_Generator, Reference_Pressure, Original_Fit["z_val"], Original_Fit.get("atoms_per_unit"), Volume_Unit=Original_Fit.get("volume_unit"))
                 Target_Model_Results[Model_Name] = {
                     "result": Fit["result"],
                     "param_stderr": Fit["param_stderr"],

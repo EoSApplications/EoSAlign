@@ -23,6 +23,21 @@ def Build_Input_Label(Unit_String, Is_Uncertainty, Prefix="Input"):
     return f"{Heading}\n{Get_Unit_Display_Name(Unit_String)}"
 
 
+# Get the volume unit the user entered from the name of the dataframe's input column, as "Volume (unit)".
+# "Input_{unit}" holds the typed values when they were converted to Å³/unit cell, and
+# "Measured_{unit}_Input" holds them when they were already Å³/unit cell. Returns None when the
+# column is not a volume input column (e.g. a wavelength or pressure column).
+def Get_Input_Volume_Display_Name(Input_Column):
+    Unit_String = None
+    if Input_Column.startswith("Input_"):
+        Unit_String = Sanitized_Volume_Units.get(Input_Column[len("Input_"):])
+    elif Input_Column.startswith("Measured_") and Input_Column.endswith("_Input"):
+        Unit_String = Input_Column[len("Measured_"):-len("_Input")]
+    if Unit_String in Volume_Units:
+        return Get_Unit_Display_Name(Unit_String)
+    return None
+
+
 
 
 # Add the abbreviation to the unit word of a "{Unit}_From_..." column. "Volume" from the method units

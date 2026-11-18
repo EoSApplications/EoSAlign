@@ -134,10 +134,17 @@ class AppFigureConfig:
 
 
 # Return the y-axis label string for the observable measurement for a given method
-def Observable_Label(Method):
+def Observable_Label(Method, Input_Mode=None, Input_Col=None):
     from Reference_Values_And_Units import Method_Units
+    from Column_Labels import Get_Input_Volume_Display_Name
 
     if Method == "XRD":
+        # When the volume is entered by the user, the plotted values are the entered values, so the
+        # label is the unit the user entered (e.g. "Volume (Å³/formula unit)"), not Å³/unit cell
+        if Input_Mode != "Pressure (GPa)" and Input_Col:
+            Input_Label = Get_Input_Volume_Display_Name(Input_Col)
+            if Input_Label:
+                return Input_Label
         return "Volume (Å³/unit cell)"
     return Method_Units.get(Method, "Observable")
 
@@ -327,7 +334,7 @@ def Build_Dataset_From_App_Data(Df, Composition, Method, Reference_Key, Selected
         "p_ref": P_Ref__GPa,
         "observable": Observable,
         "obs_unc": Obs_Unc,
-        "obs_label": Observable_Label(Method),
+        "obs_label": Observable_Label(Method, Input_Mode, Input_Col),
         "eos_list": Eos_List,
         "first_key": First_Key or "",
         "first_label": First_Label,

@@ -5,11 +5,12 @@ import inspect
 import numpy as np
     # Load local libraries
 try:
-    from ..Reference_Values_And_Units import Function_Information, Calibration_File_Variable_Information, Calibration_Key_To_Entry_Key
+    from ..Reference_Values_And_Units import Function_Information, Calibration_File_Variable_Information, Calibration_Key_To_Entry_Key, Volume_Units
 except ImportError:
-    from Reference_Values_And_Units import Function_Information, Calibration_File_Variable_Information, Calibration_Key_To_Entry_Key
+    from Reference_Values_And_Units import Function_Information, Calibration_File_Variable_Information, Calibration_Key_To_Entry_Key, Volume_Units
 from .Create_List_Of_Functions_And_Variables import Load_List_Of_Functions_And_Variables
 from .Build_Equation_Functions import Build_Equation_Function, Convert_Calibration_Keys_To_Entry_Keys
+from .Volume_Conversion_Functions import Avogadros_Number, Centimeters_Cubed__To__Angstroms_Cubed
 
 
 
@@ -154,14 +155,19 @@ def Get_Fixed_Variable_Values(Fitting_Model, Reference_Pressure, Atomic_Number=N
 
 
 
-# Get the number the measured volume is divided by to get volume per atom
-    # AP2 and H12 are written per atom, so the measured volume is divided by the number of atoms in one unit of that volume
-    # (this matches EoSAlign's volume / atoms per unit cell). Every other model uses 1.0
-def Get_Atoms_Divisor(Fitting_Model, Atoms_Per_Unit):
+# Get the number the measured volume is divided by to get volume per atom (Å³/atom)
+    # AP2 and H12 are written per atom in Å³ (the Fermi gas term ln(V0/Z) uses a_FG = 2337 GPa·Å⁵), so the measured volume
+    # is divided by the number of atoms in one unit of that volume (this matches EoSAlign's volume / atoms per unit cell)
+    # cm³/mol data (per mole of formula units) is also changed from cm³/mol to Å³ per formula unit: divide by N_A / 10²⁴
+    # Every other model uses 1.0
+def Get_Atoms_Divisor(Fitting_Model, Atoms_Per_Unit, Volume_Unit=None):
 
-    if Fitting_Model.get('needs_Z', False) and Atoms_Per_Unit and Atoms_Per_Unit > 1:
-        return Atoms_Per_Unit
-    return 1.0
+    if not Fitting_Model.get('needs_Z', False):
+        return 1.0
+    Atoms_Divisor = float(Atoms_Per_Unit) if Atoms_Per_Unit and Atoms_Per_Unit > 0 else 1.0
+    if Volume_Unit == Volume_Units[3]:
+        Atoms_Divisor *= Avogadros_Number / Centimeters_Cubed__To__Angstroms_Cubed
+    return Atoms_Divisor
 
 
 
@@ -173,10 +179,12 @@ def Get_Atoms_Divisor(Fitting_Model, Atoms_Per_Unit):
             # for example MgSiO3 is (12 + 14 + 3 * 8) / 5 = 10
         # Atoms_Per_Unit: the number of atoms in one unit of the measured volume, used to change the measured volume to volume per atom
             # for example data in volume per unit cell with 4 formula units of MgSiO3 per cell is 4 * 5 = 20, and data already in volume per atom is 1
-    # V0 should be given in volume per atom for these models
-def Build_Model_Function(Fitting_Model, Reference_Pressure, Atomic_Number=None, Atoms_Per_Unit=None):
+            # for cm³/mol data it is the number of atoms per formula unit (MgSiO3 is 5)
+        # Volume_Unit: the unit of the measured volume (one of Volume_Units); cm³/mol is also changed to Å³
+    # V0 is in Å³/atom for these models, whatever the unit of the measured volume
+def Build_Model_Function(Fitting_Model, Reference_Pressure, Atomic_Number=None, Atoms_Per_Unit=None, Volume_Unit=None):
 
-    Atoms_Divisor = Get_Atoms_Divisor(Fitting_Model, Atoms_Per_Unit)
+    Atoms_Divisor = Get_Atoms_Divisor(Fitting_Model, Atoms_Per_Unit, Volume_Unit)
     return Build_Equation_Function(
         Fitting_Model['fn'], Fitting_Model['variable_order'],
         Convert_Calibration_Keys_To_Entry_Keys(Get_Fixed_Variable_Values(Fitting_Model, Reference_Pressure, Atomic_Number)),

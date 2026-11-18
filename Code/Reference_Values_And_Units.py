@@ -131,8 +131,8 @@ Material_Information = {
     },
     'Ni': {
         'Display_Label': 'Ni',
-        'Symmetry': ['Hexagonal close-packed', 'HCP'],
-        'Formula_Units': 2,
+        'Symmetry': ['Face-centered cubic', 'FCC'],
+        'Formula_Units': 4,
         'Atoms_Per_Formula_Unit': '',
         'Atomic_Number': 28,
     },
@@ -225,28 +225,28 @@ Material_Information = {
         'Symmetry': ['Orthorhombic'],
         'Formula_Units': 4,
         'Atoms_Per_Formula_Unit': 12,  # 1 Sr + 4 B + 7 O
-        'Atomic_Number': 10.25,   # (38 + 4*5 + 7*8) / 12
+        'Atomic_Number': 9.5,   # (38 + 4*5 + 7*8) / 12
     },
     'YAG': {
         'Display_Label': 'YAG',
         'Symmetry': ['Cubic garnet'],
         'Formula_Units': 8,
         'Atoms_Per_Formula_Unit': 20,  # 3 Y + 5 Al + 12 O
-        'Atomic_Number': 13.4,   # (3*39 + 5*13 + 12*8) / 20
+        'Atomic_Number': 13.9,   # (3*39 + 5*13 + 12*8) / 20
     },
     'YAG-Y1': {
         'Display_Label': 'YAG-Y1',
         'Symmetry': ['Cubic garnet'],
         'Formula_Units': 8,
         'Atoms_Per_Formula_Unit': 20,  # 3 Y + 5 Al + 12 O
-        'Atomic_Number': 13.4,   # (3*39 + 5*13 + 12*8) / 20
+        'Atomic_Number': 13.9,   # (3*39 + 5*13 + 12*8) / 20
     },
     'YAG-Y2': {
         'Display_Label': 'YAG-Y2',
         'Symmetry': ['Cubic garnet'],
         'Formula_Units': 8,
         'Atoms_Per_Formula_Unit': 20,  # 3 Y + 5 Al + 12 O
-        'Atomic_Number': 13.4,   # (3*39 + 5*13 + 12*8) / 20
+        'Atomic_Number': 13.9,   # (3*39 + 5*13 + 12*8) / 20
     },
 
 }

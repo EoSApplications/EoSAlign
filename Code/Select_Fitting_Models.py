@@ -3,7 +3,7 @@
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QCheckBox, QSizePolicy, QMessageBox)
     # Load local functions from local files
 from Collapsible_Sections import Collapsible_Content_Container
-from Reference_Values_And_Units import Function_Information
+from Reference_Values_And_Units import Function_Information, Volume_Units
 from Fitting_Models_And_Units import Get_Models_For_Method
 from Fitting_Display_Helpers import Equation_Label, Number_Box, Make_A_Spacer, Reveal_Container, Render_Equation_Pixmap
 
@@ -13,6 +13,23 @@ from Fitting_Display_Helpers import Equation_Label, Number_Box, Make_A_Spacer, R
 
 # The space between a label and its number box (px); about the width of one space in the label font
 Label_To_Box_Space = 5
+
+
+
+# The label and tooltip of the atoms box of AP2 and H12, which depend on the unit of the measured volume
+    # cm³/mol is per mole of formula units, so the user enters the atoms per formula unit and the volume is also changed from cm³/mol to Å³
+Atoms_Label = "Atoms per volume unit (→ Å³/atom):"
+Atoms_Tooltip = "Number of atoms in one unit of the measured volume.\nÅ³/atom → 1   ·   Å³/formula unit → atoms per formula unit\nÅ³/unit cell → (formula units per cell) × (atoms per formula unit)"
+Atoms_Label_For_Moles = "Atoms per formula unit (cm³/mol → Å³/atom):"
+Atoms_Tooltip_For_Moles = "Number of atoms in one formula unit (cm³/mol is per mole of formula units), e.g. 5 for MgSiO₃.\nThe volume is changed from cm³/mol to Å³/atom for the fit."
+
+
+# Get the label and tooltip of the atoms box for the unit of the measured volume (the cm³/mol ones only apply to cm³/mol)
+def Get_Atoms_Label_And_Tooltip(Volume_Unit):
+
+    if Volume_Unit == Volume_Units[3]:
+        return Atoms_Label_For_Moles, Atoms_Tooltip_For_Moles
+    return Atoms_Label, Atoms_Tooltip
 
 
 
@@ -28,6 +45,7 @@ class Select_Fitting_Models(QWidget):
 
         # Track the widgets that are rebuilt every time the method changes
         self.Method = None
+        self.Volume_Unit = None         # the unit of the measured volume, which sets the label of the atoms box
         self.Model_Checkboxes = {}      # model name -> checkbox
         self.Parameter_Panels = {}      # model name -> collapsible section holding that model's parameters
         self.Parameter_Widgets = {}     # model name -> {parameter name -> {"guess", "fix", "unc"}}
@@ -45,13 +63,14 @@ class Select_Fitting_Models(QWidget):
     def Reset(self):
 
         self.Reference_Pressure_Box.setValue(0.0)
-        self.Refresh(Method=self.Method)
+        self.Refresh(Method=self.Method, Volume_Unit=self.Volume_Unit)
 
 
-    # Rebuild the model list for a method
-    def Refresh(self, *, Method=None, **context):
+    # Rebuild the model list for a method and the unit of the measured volume
+    def Refresh(self, *, Method=None, Volume_Unit=None, **context):
 
         self.Method = Method
+        self.Volume_Unit = Volume_Unit
         self.Rebuild_The_Model_List()
 
 
@@ -189,9 +208,10 @@ class Select_Fitting_Models(QWidget):
             Z_Layout.addStretch()
             Panel_Layout.addLayout(Z_Layout)
             # Atoms per measured volume unit, which converts the data to Å³/atom
-            Atoms_Layout = self.Make_A_Label_And_Box_Layout("Atoms per volume unit (→ Å³/atom):")
+            Label_Text, Tooltip_Text = Get_Atoms_Label_And_Tooltip(self.Volume_Unit)
+            Atoms_Layout = self.Make_A_Label_And_Box_Layout(Label_Text)
             Atoms_Box = Number_Box(1, Integer=True, Minimum=1, On_Nested_Card=True)
-            Atoms_Box.setToolTip("Number of atoms in one unit of the measured volume.\nÅ³/atom → 1   ·   Å³/formula unit → atoms per formula unit\nÅ³/unit cell → (formula units per cell) × (atoms per formula unit)")
+            Atoms_Box.setToolTip(Tooltip_Text)
             Atoms_Layout.addWidget(Atoms_Box)
             Atoms_Layout.addStretch()
             Panel_Layout.addLayout(Atoms_Layout)

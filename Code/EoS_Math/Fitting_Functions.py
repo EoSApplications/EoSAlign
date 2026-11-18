@@ -260,7 +260,7 @@ def Calculate_Covariance_Ellipse(Variance_A, Variance_B, Covariance_AB, Number_O
     # Fixed_Uncertainties: the uncertainty of each fixed parameter that has one, by name (empty if none do)
     # Measurement_Grid: the measurements the fitted curve is calculated at
     # Random_Generator: the numpy random generator the Monte Carlo draws come from
-    # Reference_Pressure, Atomic_Number, Atoms_Per_Unit: the values the user enters for the model (see Build_Model_Function)
+    # Reference_Pressure, Atomic_Number, Atoms_Per_Unit, Volume_Unit: the values the user enters for the model (see Build_Model_Function)
     # Returns a dictionary:
         # result: the lmfit result
         # param_stderr: the uncertainty of every parameter with the uncertainty of the fixed parameters added in (None if there are none)
@@ -269,10 +269,10 @@ def Calculate_Covariance_Ellipse(Variance_A, Variance_B, Covariance_AB, Number_O
         # p_std: the uncertainty of the pressure of the fitted curve
 def Fit_Fitting_Model(Fitting_Model, Starting_Values, Fixed_Parameters, Fixed_Uncertainties,
                       Measurement_Values, Pressure_Values, Measurement_Uncertainties, Pressure_Uncertainties,
-                      Measurement_Grid, Random_Generator, Reference_Pressure, Atomic_Number=None, Atoms_Per_Unit=None, Number_Of_Draws=2000):
+                      Measurement_Grid, Random_Generator, Reference_Pressure, Atomic_Number=None, Atoms_Per_Unit=None, Number_Of_Draws=2000, Volume_Unit=None):
 
     # Build the model and give every parameter its starting value, limit and whether it is fixed
-    LMFit_Model = Model(Build_Model_Function(Fitting_Model, Reference_Pressure, Atomic_Number, Atoms_Per_Unit), independent_vars=['x'])
+    LMFit_Model = Model(Build_Model_Function(Fitting_Model, Reference_Pressure, Atomic_Number, Atoms_Per_Unit, Volume_Unit), independent_vars=['x'])
     LMFit_Parameters = LMFit_Model.make_params()
     for Parameter in Fitting_Model['params']:
         Name = Parameter['name']
@@ -296,7 +296,7 @@ def Fit_Fitting_Model(Fitting_Model, Starting_Values, Fixed_Parameters, Fixed_Un
 
     # The fitted curve and its uncertainty
     Fixed_Variable_Values = Get_Fixed_Variable_Values(Fitting_Model, Reference_Pressure, Atomic_Number)
-    Atoms_Divisor = Get_Atoms_Divisor(Fitting_Model, Atoms_Per_Unit)
+    Atoms_Divisor = Get_Atoms_Divisor(Fitting_Model, Atoms_Per_Unit, Volume_Unit)
     Nominal_Curve = Evaluate_Model_Pressures(Fitting_Model, Fixed_Variable_Values, Measurement_Grid,
                                              {Name: Fit_Result.params[Name].value for Name in Fit_Result.params}, Atoms_Divisor)
     Uncertainty_Band = Calculate_Uncertainty_Band(

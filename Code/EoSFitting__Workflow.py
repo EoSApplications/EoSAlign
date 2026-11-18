@@ -57,7 +57,7 @@ class Fitting_Workflow:
 
         # No units are selected until the user chooses them
         Method = Get_Method_For_Unit(Units or None)
-        self.Select_Models_Content.Refresh(Method=Method)
+        self.Select_Models_Content.Refresh(Method=Method, Volume_Unit=Units)
         self.Alignment_Studies_Content.Refresh(Method=Method)
 
 
@@ -87,7 +87,7 @@ class Fitting_Workflow:
         self.Data = Data
 
         # Fit every checked model
-        self.Fit_Results, Reports = Run_Fits(Checked_Models, self.Select_Models_Content.Read_Parameter_Widgets, self.Select_Models_Content.Read_Composition_Inputs, Data["Measurement"], Data["Sigma_Measurement"], Data["Pressure"], Data["Sigma_Pressure"], self.Select_Models_Content.Get_Reference_Pressure(), self.Random_Generator)
+        self.Fit_Results, Reports = Run_Fits(Checked_Models, self.Select_Models_Content.Read_Parameter_Widgets, self.Select_Models_Content.Read_Composition_Inputs, Data["Measurement"], Data["Sigma_Measurement"], Data["Pressure"], Data["Sigma_Pressure"], self.Select_Models_Content.Get_Reference_Pressure(), self.Random_Generator, Volume_Unit=Data["Units"])
 
         # Show the results
         Y_Label = Get_Measurement_Axis_Label(Data["Units"])
